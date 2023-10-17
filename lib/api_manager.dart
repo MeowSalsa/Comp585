@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -5,35 +7,11 @@ import 'package:http/http.dart' as http;
     <!-- Required to fetch data from the internet. -->
     <uses-permission android:name="android.permission.INTERNET" /> */
 
-/* class WeatherPoint {
-  //final String gridId;
-  final String gridX;
-  final String gridY;
-  final String forecast;
-  final String forecastHourly;
-  final String city;
-  final String state;
-
-  const WeatherPoint(
-      { //required this.gridId,
-      required this.gridX,
-      required this.gridY,
-      required this.forecast,
-      required this.forecastHourly,
-      required this.city,
-      required this.state});
-
-  factory WeatherPoint.fromJSon(Map<String, dynamic> json) {
-    return WeatherPoint(
-        // gridId: json['gridId'],
-        gridX: json['gridX'],
-        gridY: json['gridY'],
-        forecast: json['forecast'],
-        forecastHourly: json['forecastHourly'],
-        city: json['city'],
-        state: json['state']);
-  }
-} */
+///
+/// API DOCUMENTATION: https://www.weather.gov/documentation/services-web-api#/
+/// We are using the GeoJson format so if you try to look up the data in the
+///  API documentation look for "GridpointForecastGeoJson"
+///
 class WeatherPoint {
   String? id;
   Properties? properties;
@@ -59,54 +37,30 @@ class WeatherPoint {
 
 class Properties {
   String? id;
-  String? type;
   String? gridId;
   int? gridX;
   int? gridY;
-  String? forecast;
-  String? forecastHourly;
   RelativeLocation? relativeLocation;
-  String? radarStation;
 
   Properties(
-      {this.id,
-      this.type,
-      this.gridId,
-      this.gridX,
-      this.gridY,
-      this.forecast,
-      this.forecastHourly,
-      this.relativeLocation,
-      this.radarStation});
+      {this.id, this.gridId, this.gridX, this.gridY, this.relativeLocation});
 
   Properties.fromJson(Map<String, dynamic> json) {
     id = json['@id'];
-    type = json['@type'];
     gridId = json['gridId'];
     gridX = json['gridX'];
     gridY = json['gridY'];
-    forecast = json['forecast'];
-    forecastHourly = json['forecastHourly'];
     relativeLocation = json['relativeLocation'] != null
         ? RelativeLocation.fromJson(json['relativeLocation'])
         : null;
-    radarStation = json['radarStation'];
   }
 //Might need this section for saving user's favorited locations.
   /*  Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['@id'] = this.id;
-    data['@type'] = this.type;
     data['gridId'] = this.gridId;
     data['gridX'] = this.gridX;
     data['gridY'] = this.gridY;
-    data['forecast'] = this.forecast;
-    data['forecastHourly'] = this.forecastHourly;
-    if (this.relativeLocation != null) {
-      data['relativeLocation'] = this.relativeLocation!.toJson();
-    }
-    data['radarStation'] = this.radarStation;
-    return data;
   } */
 }
 
@@ -134,23 +88,163 @@ class LocationProperties {
   }
 }
 
+class Forecast {
+  ForecastProperties? properties;
+
+  Forecast({this.properties});
+
+  Forecast.fromJson(Map<String, dynamic> json) {
+    properties = json['properties'] != null
+        ? ForecastProperties.fromJson(json['properties'])
+        : null;
+  }
+}
+
+class ForecastProperties {
+  String? updated;
+  String? units;
+  String? forecastGenerator;
+  String? generatedAt;
+  String? updateTime;
+  String? validTimes;
+  List<Periods>? periods;
+
+  ForecastProperties(
+      {this.updated,
+      this.units,
+      this.forecastGenerator,
+      this.generatedAt,
+      this.updateTime,
+      this.validTimes,
+      this.periods});
+
+  ForecastProperties.fromJson(Map<String, dynamic> json) {
+    updated = json['updated'];
+    units = json['units'];
+    forecastGenerator = json['forecastGenerator'];
+    generatedAt = json['generatedAt'];
+    updateTime = json['updateTime'];
+    validTimes = json['validTimes'];
+    if (json['periods'] != null) {
+      periods = <Periods>[];
+      json['periods'].forEach((v) {
+        periods!.add(Periods.fromJson(v));
+      });
+    }
+  }
+}
+
+class Periods {
+  int? number;
+  String? name;
+  String? startTime;
+  String? endTime;
+  bool? isDaytime;
+  int? temperature;
+  String? temperatureUnit;
+  ProbabilityOfPrecipitation? probabilityOfPrecipitation;
+  ProbabilityOfPrecipitation? relativeHumidity;
+  String? windSpeed;
+  String? windDirection;
+  String? icon;
+  String? shortForecast;
+  String? detailedForecast;
+
+  Periods(
+      {this.number,
+      this.name,
+      this.startTime,
+      this.endTime,
+      this.isDaytime,
+      this.temperature,
+      this.temperatureUnit,
+      this.probabilityOfPrecipitation,
+      this.relativeHumidity,
+      this.windSpeed,
+      this.windDirection,
+      this.icon,
+      this.shortForecast,
+      this.detailedForecast});
+
+  Periods.fromJson(Map<String, dynamic> json) {
+    number = json['number'];
+    name = json['name'];
+    startTime = json['startTime'];
+    endTime = json['endTime'];
+    isDaytime = json['isDaytime'];
+    temperature = json['temperature'];
+    temperatureUnit = json['temperatureUnit'];
+    probabilityOfPrecipitation = json['probabilityOfPrecipitation'] != null
+        ? ProbabilityOfPrecipitation.fromJson(
+            json['probabilityOfPrecipitation'])
+        : null;
+    relativeHumidity = json['relativeHumidity'] != null
+        ? ProbabilityOfPrecipitation.fromJson(json['relativeHumidity'])
+        : null;
+    windSpeed = json['windSpeed'];
+    windDirection = json['windDirection'];
+    icon = json['icon'];
+    shortForecast = json['shortForecast'];
+    detailedForecast = json['detailedForecast'];
+  }
+}
+
+class ProbabilityOfPrecipitation {
+  String? unitCode;
+  int? value;
+
+  ProbabilityOfPrecipitation({this.unitCode, this.value});
+
+  ProbabilityOfPrecipitation.fromJson(Map<String, dynamic> json) {
+    unitCode = json['unitCode'];
+    value = json['value'];
+  }
+}
+
+///APIManager class is responsible for making the appropriate API calls,
+///handling the data returned by the API,
+///and returning the appropriate object that can hold the data required for the
+///application.
 class APIManager {
   //Debugging: Coordinates for CSUN.
   final String testLat = "34.2406756";
   final String testLong = "-118.5325945";
 
+  ///  Uses two coordinates to make a call to National Weather API
+  ///  to retrieve the id, gridId, gridX, gridY.
+  ///
+  /// Needs latitude and longitude strings to make the call.
   Future<WeatherPoint> getWeatherPoint() async {
     final response = await http
         .get(Uri.parse('https://api.weather.gov/points/$testLat,$testLong'));
 
     if (response.statusCode == 200) {
-      print("All good in HTTP call");
+      print("WeatherPoint HTTP: Success");
       final data = jsonDecode(response.body);
-      print(data);
+      //print(data);
       final newWeatherPoint = WeatherPoint.fromJson(data);
       return newWeatherPoint;
     } else {
-      throw Exception('HTTP Failed');
+      throw Exception('WeatherPoint HTTP: Fail');
+    }
+  }
+
+  /// Uses the gridID, gridX, gridY to get the weather information for the requested
+  /// area.
+  Future<Forecast> getForecast(WeatherPoint currentWeatherPoint) async {
+    String? gridX = currentWeatherPoint.properties?.gridX.toString();
+    String? gridY = currentWeatherPoint.properties?.gridY.toString();
+    final response = await http.get(Uri.parse(
+        "https://api.weather.gov/gridpoints/${currentWeatherPoint.properties?.gridId}/$gridX,$gridY/forecast"));
+
+    if (response.statusCode == 200) {
+      print("Forecast HTTP: Success");
+      final data = jsonDecode(response.body);
+      //print(data);
+      final newForecast = Forecast.fromJson(data);
+      return newForecast;
+    } else {
+      throw Exception('Forecast HTTP: Fail');
     }
   }
 }

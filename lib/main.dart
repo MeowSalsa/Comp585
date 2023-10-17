@@ -1,3 +1,7 @@
+// ignore_for_file: avoid_print
+
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'api_manager.dart';
 
@@ -6,21 +10,37 @@ void main() {
   runApp(const MainApp());
 }
 
+//Testing functions Begin
+HashMap<String, WeatherPoint> locationMap = HashMap();
 testWeatherPoint() async {
   final weatherPointAPIResult = await APIManager().getWeatherPoint();
-  //print(weatherPointAPIResult.gridId);
-  print(weatherPointAPIResult.id);
-  print(weatherPointAPIResult.properties);
-  var prop = weatherPointAPIResult.properties;
-  print(prop?.forecast);
-  print(prop?.forecastHourly);
-  print(prop?.gridId);
-  print(prop?.gridX);
-  print(prop?.gridY);
-  print(prop?.relativeLocation?.properties?.city);
-  print(prop?.relativeLocation?.properties?.state);
+  testPrintouts(weatherPointAPIResult);
+  locationMap[weatherPointAPIResult.properties?.gridId as String] =
+      weatherPointAPIResult;
+  print("Map length: ${locationMap.length}");
+  testForecast();
 }
 
+void testPrintouts(WeatherPoint apiResult) {
+  print(apiResult.id);
+  print(apiResult.properties);
+  var properties = apiResult.properties;
+  print(properties?.gridId);
+  print(properties?.gridX);
+  print(properties?.gridY);
+  print(properties?.relativeLocation?.properties?.city);
+  print(properties?.relativeLocation?.properties?.state);
+}
+
+testForecast() async {
+  Forecast result;
+  locationMap.forEach((key, value) async {
+    result = await APIManager().getForecast(value);
+    print("Forceast periods length ${result.properties?.periods?.length}");
+  });
+}
+
+//Testing Functions End
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
