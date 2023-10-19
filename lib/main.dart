@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'api_manager.dart';
@@ -37,7 +38,20 @@ testForecast() async {
   locationMap.forEach((key, value) async {
     result = await APIManager().getForecast(value);
     print("Forceast periods length ${result.properties?.periods?.length}");
+    printForecast(result);
   });
+}
+
+printForecast(Forecast forecast) {
+  List<Periods>? weatherPeriods = forecast.properties?.periods;
+
+  for (int i = 0; i < weatherPeriods!.length; i++)
+  {
+    int? currentTemp = weatherPeriods[i].temperature;
+    String? currentStartTime = weatherPeriods[i].startTime;
+    DateTime currentDate = DateTime.parse(currentStartTime!).toLocal();
+    print("$currentDate: $currentTemp");
+  }
 }
 
 //Testing Functions End

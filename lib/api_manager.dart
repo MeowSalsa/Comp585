@@ -110,13 +110,16 @@ class ForecastProperties {
   List<Periods>? periods;
 
   ForecastProperties(
-      {this.updated,
+    {
+      this.updated,
       this.units,
       this.forecastGenerator,
       this.generatedAt,
       this.updateTime,
       this.validTimes,
-      this.periods});
+      this.periods
+    }
+  );
 
   ForecastProperties.fromJson(Map<String, dynamic> json) {
     updated = json['updated'];
