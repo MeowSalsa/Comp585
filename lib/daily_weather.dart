@@ -4,45 +4,29 @@ import 'api_manager.dart';
 
 class CurrentWeatherDisplay extends StatelessWidget {
 
-  getWeatherPeriods() async {
-    final weatherPoint = await APIManager().getWeatherPoint();
-
-    Forecast forecast = await APIManager().getForecast(weatherPoint);
-
-    List<Periods>? weatherPeriods = forecast.properties?.periods;
-    return weatherPeriods;
-
-    //for (int i = 0; i < weatherPeriods!.length; i++)
-    //{
-    //  currentTemp = weatherPeriods![0].temperature;
-    //  String? currentStartTime = weatherPeriods[0].startTime;
-    //  currentDate = DateTime.parse(currentStartTime!).toLocal();
-    //}
-  }
-
   @override
   Widget build(BuildContext context) {
 
+    String? currentCity = "";
+    String? currentState = "";
     int? currentTemp = 0;
-    DateTime currentDate = DateTime.now();
+    String? currentUnits = "";
+    String? currentCond = "";
 
-    Future<List<Periods>> getCurrentWeather() async {
-      var currentWeatherPeriods = await getWeatherPeriods();
+    Future<WeatherPoint> getCurrentWeather() async {
 
-      for (int i = 0; i < currentWeatherPeriods!.length; i++)
-      {
-        currentTemp = currentWeatherPeriods![i].temperature;
-        String? currentStartTime = currentWeatherPeriods[i].startTime;
-        currentDate = DateTime.parse(currentStartTime!).toLocal();
+      var currentWeatherPoint = await APIManager().getWeatherPoint();
+      Forecast forecast = await APIManager().getForecast(currentWeatherPoint);
+      RelativeLocation? currentLocation = currentWeatherPoint.properties!.relativeLocation;
+      Periods currentPeriod = forecast.properties!.periods![0];
 
-        print("$currentDate: $currentTemp");
-      }
+      currentCity = currentLocation!.properties!.city;
+      currentState = currentLocation!.properties!.state;
+      currentTemp = currentPeriod.temperature;
+      currentUnits = currentPeriod.temperatureUnit;
+      currentCond = currentPeriod.shortForecast;
 
-      currentTemp = currentWeatherPeriods![0].temperature;
-      String? currentStartTime = currentWeatherPeriods[0].startTime;
-      currentDate = DateTime.parse(currentStartTime!).toLocal();
-
-      return currentWeatherPeriods;
+      return currentWeatherPoint;
     }
     
     return Scaffold(
@@ -50,10 +34,36 @@ class CurrentWeatherDisplay extends StatelessWidget {
         child: FutureBuilder(
           future: getCurrentWeather(),
           builder: (context, snapshot) {
+
             if(!snapshot.hasData){
               return const CircularProgressIndicator();
             }
-            return Text("$currentDate: $currentTemp");
+
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "$currentCity, $currentState",
+                  style: const TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  "$currentTemp\u00B0$currentUnits",
+                  style: const TextStyle(
+                    fontSize: 96,
+                  ),
+                ),
+                Text(
+                  "$currentCond",
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            );
           },
         ),
       ),
