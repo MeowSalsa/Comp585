@@ -1,15 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+// Mock function to simulate fetching weather details for a city
+Future<String> fetchWeatherDetails(String city) async {
+  // In reality, you'd make an API call here and get the details for the city.
+  await Future.delayed(const Duration(seconds: 1)); // Simulating network delay
+  return "Weather details for $city"; // Placeholder text
+}
+
+class DetailScreen extends StatefulWidget {
+  final String city;
+
+  const DetailScreen({Key? key, required this.city}) : super(key: key);
+
+  @override
+  _DetailScreenState createState() => _DetailScreenState();
+}
+
+class _DetailScreenState extends State<DetailScreen> {
+  late Future<String> weatherDetails;
+
+  @override
+  void initState() {
+    super.initState();
+    weatherDetails = fetchWeatherDetails(widget.city);
+  }
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('${widget.city} Weather Details')),
+      body: Center(
+        child: FutureBuilder<String>(
+          future: weatherDetails,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return const Text("Error fetching weather details");
+            } else {
+              return Text(snapshot.data ?? "No details available");
+            }
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    String formattedDate = DateFormat('EEEE, MMMM d, y').format(DateTime.now());
+
     return MaterialApp(
       home: Scaffold(
         backgroundColor: Colors.lightBlue[50], // Light sky blue background
@@ -35,19 +85,20 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        body: const Padding(
-          padding: EdgeInsets.all(16.0),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
               Align(
                 alignment: Alignment.topLeft,
                 child: Text(
-                  'Day, Month Date, Year',
-                  style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                  formattedDate, // this variable holds today's formatted date
+                  style: const TextStyle(
+                      fontSize: 24.0, fontWeight: FontWeight.bold),
                 ),
               ),
-              SizedBox(height: 10.0),
-              Expanded(child: CurvedSquareIcon()),
+              const SizedBox(height: 10.0),
+              const Expanded(child: CurvedSquareIcon()),
             ],
           ),
         ),
@@ -70,56 +121,66 @@ class CurvedSquareIcon extends StatelessWidget {
       mainAxisSpacing: 10,
       crossAxisCount: 2,
       children: <Widget>[
-        _buildWeatherBox('Los Angeles, CA', '76°', 'Sunny',
+        _buildWeatherBox(context, 'Los Angeles, CA', '76°', 'Sunny',
             FontAwesomeIcons.sun, Colors.yellow),
-        _buildWeatherBox('New York, NY', '63°', 'Mostly Sunny', Icons.wb_sunny,
-            Colors.yellow),
-        _buildWeatherBox('Las Vegas, NV', '90°', 'Sunny',
+        _buildWeatherBox(context, 'New York, NY', '63°', 'Mostly Sunny',
+            Icons.wb_sunny, Colors.yellow),
+        _buildWeatherBox(context, 'Las Vegas, NV', '90°', 'Sunny',
             FontAwesomeIcons.sunPlantWilt, Colors.yellow),
-        _buildWeatherBox('Boston, MA', '63°', 'Isolated Rain Showers',
+        _buildWeatherBox(context, 'Boston, MA', '63°', 'Isolated Rain Showers',
             FontAwesomeIcons.cloudRain, Colors.blue),
         _buildWeatherBox(
+            context,
             'Miami, FL',
             '87°',
             'Chance Showers And Thunderstorms',
             // ignore: deprecated_member_use
             FontAwesomeIcons.thunderstorm,
             Colors.red),
-        _buildWeatherBox('Austin, TX', '81°', 'Slight Chance Rain Showers',
-            Icons.cloud, Colors.grey),
+        _buildWeatherBox(context, 'Austin, TX', '81°',
+            'Slight Chance Rain Showers', Icons.cloud, Colors.grey),
       ],
     );
   }
 
-  Widget _buildWeatherBox(String city, String temperature, String weather,
-      IconData icon, Color iconColor) {
-    return Container(
-      width: 150.0,
-      height: 150.0,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min, // Adjust the main axis size
-          children: [
-            Text(city,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            // Adjusted font size
-            SizedBox(height: 5),
-            Icon(icon, size: 40, color: iconColor),
-            // Adjusted icon size
-            SizedBox(height: 5),
-            Text(temperature,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            // Adjusted font size
-            SizedBox(height: 5),
-            Text(weather, style: TextStyle(fontSize: 12)),
-            // Adjusted font size
-          ],
+  Widget _buildWeatherBox(BuildContext context, String city, String temperature,
+      String weather, IconData icon, Color iconColor) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => DetailScreen(city: city)),
+          );
+        },
+        child: Container(
+          width: 150.0,
+          height: 150.0,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min, // Adjust the main axis size
+              children: [
+                Text(city,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 14)),
+                const SizedBox(height: 5),
+                Icon(icon, size: 40, color: iconColor),
+                const SizedBox(height: 5),
+                Text(temperature,
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 5),
+                Text(weather, style: const TextStyle(fontSize: 12)),
+              ],
+            ),
+          ),
         ),
       ),
     );
