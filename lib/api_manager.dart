@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:http/http.dart' as http;
 /* Additionally, in your AndroidManifest.xml file, add the Internet permission.
@@ -201,6 +202,188 @@ class ProbabilityOfPrecipitation {
   }
 }
 
+//Hourly Forecast classes
+class HourlyForecast {
+  HourlyForecastProperties? properties;
+
+  HourlyForecast({this.properties});
+
+  HourlyForecast.fromJson(Map<String, dynamic> json) {
+    properties = json['properties'] != null
+        ? HourlyForecastProperties.fromJson(json['properties'])
+        : null;
+  }
+}
+
+class HourlyForecastProperties {
+  String? updated;
+  String? units;
+  String? forecastGenerator;
+  String? generatedAt;
+  String? updateTime;
+  String? validTimes;
+  List<HourlyPeriods>? periods;
+
+  HourlyForecastProperties(
+      {this.updated,
+      this.units,
+      this.forecastGenerator,
+      this.generatedAt,
+      this.updateTime,
+      this.validTimes,
+      this.periods});
+
+  HourlyForecastProperties.fromJson(Map<String, dynamic> json) {
+    updated = json['updated'];
+    units = json['units'];
+    forecastGenerator = json['forecastGenerator'];
+    generatedAt = json['generatedAt'];
+    updateTime = json['updateTime'];
+    validTimes = json['validTimes'];
+    if (json['periods'] != null) {
+      periods = <HourlyPeriods>[];
+      json['periods'].forEach((v) {
+        periods!.add(HourlyPeriods.fromJson(v));
+      });
+    }
+  }
+}
+
+class HourlyPeriods {
+  int? number;
+  String? name;
+  String? startTime;
+  String? endTime;
+  bool? isDaytime;
+  int? temperature;
+  String? temperatureUnit;
+  ProbabilityOfPrecipitation? probabilityOfPrecipitation;
+  ProbabilityOfPrecipitation? relativeHumidity;
+  String? windSpeed;
+  String? windDirection;
+  String? icon;
+  String? shortForecast;
+  String? detailedForecast;
+
+  HourlyPeriods(
+      {this.number,
+      this.name,
+      this.startTime,
+      this.endTime,
+      this.isDaytime,
+      this.temperature,
+      this.temperatureUnit,
+      this.probabilityOfPrecipitation,
+      this.relativeHumidity,
+      this.windSpeed,
+      this.windDirection,
+      this.icon,
+      this.shortForecast,
+      this.detailedForecast});
+
+  HourlyPeriods.fromJson(Map<String, dynamic> json) {
+    number = json['number'];
+    name = json['name'];
+    startTime = json['startTime'];
+    endTime = json['endTime'];
+    isDaytime = json['isDaytime'];
+    temperature = json['temperature'];
+    temperatureUnit = json['temperatureUnit'];
+    probabilityOfPrecipitation = json['probabilityOfPrecipitation'] != null
+        ? ProbabilityOfPrecipitation.fromJson(
+            json['probabilityOfPrecipitation'])
+        : null;
+    relativeHumidity = json['relativeHumidity'] != null
+        ? ProbabilityOfPrecipitation.fromJson(json['relativeHumidity'])
+        : null;
+    windSpeed = json['windSpeed'];
+    windDirection = json['windDirection'];
+    icon = json['icon'];
+    shortForecast = json['shortForecast'];
+    detailedForecast = json['detailedForecast'];
+  }
+}
+
+class HourlyProbabilityOfPrecipitation {
+  String? unitCode;
+  int? value;
+
+  HourlyProbabilityOfPrecipitation({this.unitCode, this.value});
+
+  HourlyProbabilityOfPrecipitation.fromJson(Map<String, dynamic> json) {
+    unitCode = json['unitCode'];
+    value = json['value'];
+  }
+}
+
+//Geocoding: Coordinates from zip code
+
+class CoordinatesFromZip {
+  List<Results>? results;
+  String? status;
+
+  CoordinatesFromZip({this.results, this.status});
+
+  CoordinatesFromZip.fromJson(Map<String, dynamic> json) {
+    if (json['results'] != null) {
+      results = <Results>[];
+      json['results'].forEach((v) {
+        results!.add(Results.fromJson(v));
+      });
+    }
+    status = json['status'];
+  }
+}
+
+class Results {
+  //String? formattedAddress;
+  Geometry? geometry;
+/*   String? placeId;
+  List<String>? postcodeLocalities;
+  List<String>? types; */
+
+  Results({
+    //this.formattedAddress,
+    this.geometry,
+    /* this.placeId,
+      this.postcodeLocalities,
+      this.types */
+  });
+
+  Results.fromJson(Map<String, dynamic> json) {
+    //formattedAddress = json['formatted_address'];
+    geometry =
+        json['geometry'] != null ? Geometry.fromJson(json['geometry']) : null;
+    //placeId = json['place_id'];
+    //postcodeLocalities = json['postcode_localities'].cast<String>();
+    //types = json['types'].cast<String>();
+  }
+}
+
+class Geometry {
+  Location? location;
+
+  Geometry({
+    this.location,
+  });
+
+  Geometry.fromJson(Map<String, dynamic> json) {
+    location =
+        json['location'] != null ? Location.fromJson(json['location']) : null;
+  }
+}
+
+class Location {
+  double latitude = double.infinity;
+  double longitude = double.infinity;
+  Location.fromJson(Map<String, dynamic> json) {
+    latitude = json['lat'];
+    longitude = json['lng'];
+  }
+}
+
+//GeoCoding: Coordinates from city, state
+
 ///APIManager class is responsible for making the appropriate API calls,
 ///handling the data returned by the API,
 ///and returning the appropriate object that can hold the data required for the
@@ -247,4 +430,52 @@ class APIManager {
       throw Exception('Forecast HTTP: Fail');
     }
   }
+
+  Future<HourlyForecast> getHourlyForecast(
+      WeatherPoint currentWeatherPoint) async {
+    String? gridX = currentWeatherPoint.properties?.gridX.toString();
+    String? gridY = currentWeatherPoint.properties?.gridY.toString();
+    print(
+        "https://api.weather.gov/gridpoints/${currentWeatherPoint.properties?.gridId}/$gridX,$gridY/forecast/hourly");
+    final response = await http.get(Uri.parse(
+        "https://api.weather.gov/gridpoints/${currentWeatherPoint.properties?.gridId}/$gridX,$gridY/forecast/hourly"));
+
+    if (response.statusCode == 200) {
+      print("Hourly Forecast HTTP: Success");
+      final data = jsonDecode(response.body);
+      //print(data);
+      final newForecast = HourlyForecast.fromJson(data);
+      return newForecast;
+    } else {
+      throw Exception('Hourly Forecast HTTP: Fail');
+    }
+  }
+
+  Future<Location?> getCoordinatesFromZip(String location) async {
+    final response = await http.get(Uri.parse(
+        "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=AIzaSyDeKwo1CHHgV09Jfh-MVGxHzpvKWDXr-vQ"));
+    if (response.statusCode == 200) {
+      print("Geocode Location->Coord HTTP: Success");
+      final data = jsonDecode(response.body);
+      //print(data);
+      final newCoord = CoordinatesFromZip.fromJson(data);
+      return newCoord.results?[0].geometry?.location;
+    } else {
+      throw Exception('Geocode Location->Coord HTTP: Fail');
+    }
+  }
+
+  /*  Future<Location?> getCoordinatesFromCityState(String cityState) async {
+    final response = await http.get(Uri.parse(
+        "https://maps.googleapis.com/maps/api/geocode/json?address=$cityState&key=AIzaSyDeKwo1CHHgV09Jfh-MVGxHzpvKWDXr-vQ"));
+    if (response.statusCode == 200) {
+      print("Geocode City,State->Coord HTTP: Success");
+      final data = jsonDecode(response.body);
+      //print(data);
+      final newCoord = CoordinatesFromZip.fromJson(data);
+      return newCoord.results?[0].geometry?.location;
+    } else {
+      throw Exception('Geocode City,State->Coord HTTP: Fail');
+    }
+  } */
 }
