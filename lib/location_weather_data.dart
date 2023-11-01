@@ -10,10 +10,10 @@ class LocationWeatherData {
 
   LocationWeatherData(String location) {
     print("Creating new location");
-    locationToWeatherPoint(location);
+    _locationToWeatherPoint(location);
   }
 
-  void locationToWeatherPoint(String location) async {
+  void _locationToWeatherPoint(String location) async {
     Location? locationData;
     locationData = await APIManager().getCoordinates("91340");
     if (locationData == null) {
@@ -24,14 +24,14 @@ class LocationWeatherData {
       if (weatherPointData == null) {
         print("weather point data error");
       } else {
-        setCity(weatherPointData);
+        _setCity(weatherPointData);
         state =
             weatherPointData.properties?.relativeLocation?.properties?.state;
       }
     }
   }
 
-  void weatherPointToForecast(WeatherPoint weatherPoint) async {
+  void _weatherPointToForecast(WeatherPoint weatherPoint) async {
     Forecast? newForecast;
     newForecast = await APIManager().getForecast(weatherPoint);
     if (newForecast == null) {
@@ -41,7 +41,7 @@ class LocationWeatherData {
     }
   }
 
-  void weatherPointToHourlyForecast(WeatherPoint weatherPoint) async {
+  void _weatherPointToHourlyForecast(WeatherPoint weatherPoint) async {
     HourlyForecast? newHourlyForecast;
     newHourlyForecast = await APIManager().getHourlyForecast(weatherPoint);
     if (newHourlyForecast == null) {
@@ -51,7 +51,15 @@ class LocationWeatherData {
     }
   }
 
-  void setCity(WeatherPoint weatherPointData) {
+  void _setCity(WeatherPoint weatherPointData) {
     city = weatherPointData.properties?.relativeLocation?.properties?.city;
+  }
+
+  Forecast? getForecast() async {
+    if (forecast == null) {
+      await _weatherPointToForecast(weatherPoint!);
+      return forecast;
+    }
+    return forecast;
   }
 }

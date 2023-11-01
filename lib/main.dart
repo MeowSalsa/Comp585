@@ -9,7 +9,11 @@ void main() {
   //runTests();
   LocationWeatherData newLocation = LocationWeatherData("91340");
   Future.delayed(const Duration(seconds: 2), () {
+    newLocation.getForecast();
+  });
+  Future.delayed(const Duration(seconds: 2), () {
     print(newLocation.city);
+    print(newLocation.forecast?.properties?.periods);
   });
   runApp(const MainApp());
 }
