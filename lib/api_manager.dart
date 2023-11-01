@@ -392,21 +392,15 @@ class APIManager {
   final String testLat = "34.2406756";
   final String testLong = "-118.5325945";
 
-  static bool weatherPointLock = false;
-  static bool forecastLock = false;
-  static bool hourlyForecastLock = false;
-  static bool getCoordinatesLock = false;
-
   ///  Uses two coordinates to make a call to National Weather API
   ///  to retrieve the id, gridId, gridX, gridY.
   ///
   /// Needs latitude and longitude strings to make the call.
-  Future<WeatherPoint?> getWeatherPoint() async {
-    if (weatherPointLock) {
-      return Future(() => null);
-    }
-    final response = await http
-        .get(Uri.parse('https://api.weather.gov/points/$testLat,$testLong'));
+  Future<WeatherPoint?> getWeatherPoint(Location locationData) async {
+    var lat = locationData.latitude;
+    var long = locationData.longitude;
+    final response =
+        await http.get(Uri.parse('https://api.weather.gov/points/$lat,$long'));
 
     if (response.statusCode == 200) {
       print("WeatherPoint HTTP: Success");
@@ -459,38 +453,18 @@ class APIManager {
   }
 
   Future<Location?> getCoordinates(String location) async {
-    if (getCoordinatesLock) {
-      print("getCoordinates is locked");
-      return Future(() => null);
-    } else {
-      getCoordinatesLock = true;
-      final response = await http.get(Uri.parse(
-          "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=AIzaSyDeKwo1CHHgV09Jfh-MVGxHzpvKWDXr-vQ"));
-      if (response.statusCode == 200) {
-        print("Geocode Location->Coord HTTP: Success");
-        final data = jsonDecode(response.body);
-        //print(data);
-        final newCoord = CoordinatesFromZip.fromJson(data);
-        getCoordinatesLock = false;
-        return newCoord.results?[0].geometry?.location;
-      } else {
-        getCoordinatesLock = false;
-        throw Exception('Geocode Location->Coord HTTP: Fail');
-      }
-    }
-  }
-
-  /*  Future<Location?> getCoordinatesFromCityState(String cityState) async {
     final response = await http.get(Uri.parse(
-        "https://maps.googleapis.com/maps/api/geocode/json?address=$cityState&key=AIzaSyDeKwo1CHHgV09Jfh-MVGxHzpvKWDXr-vQ"));
+        "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=AIzaSyDeKwo1CHHgV09Jfh-MVGxHzpvKWDXr-vQ"));
     if (response.statusCode == 200) {
-      print("Geocode City,State->Coord HTTP: Success");
+      print("Geocode Location->Coord HTTP: Success");
       final data = jsonDecode(response.body);
       //print(data);
       final newCoord = CoordinatesFromZip.fromJson(data);
       return newCoord.results?[0].geometry?.location;
     } else {
-      throw Exception('Geocode City,State->Coord HTTP: Fail');
+      //return a null location instead. Prevents stack from being thrown out
+      print("Geocode Location->Coord HTTP: Fail");
+      return null;
     }
-  } */
+  }
 }
