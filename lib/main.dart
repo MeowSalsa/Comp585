@@ -14,30 +14,6 @@ void main() {
   runApp(const MainApp());
 }
 
-/* void runTests() {
-  print(DateTime.now());
-  testWeatherPoint();
-  Future.delayed(const Duration(seconds: 2), () {
-    print("Starting Forecast Test");
-    print(DateTime.now());
-    testForecast();
-  });
-  Future.delayed(const Duration(seconds: 2), () {
-    print("Starting Hourly Forecast Test");
-    testHourlyForecast();
-  });
-  /*  Future.delayed(const Duration(seconds: 2), () {
-    print("Starting Coordinates from City,State");
-    testCoordsFromCityState();
-    print("Starting coordinates from zip iniside city,state");
-    testCoordsFromZip();
-  }); */
-  Future.delayed(const Duration(seconds: 5), () {
-    print("Starting Coordinates from City,State NOTE mutex should be unlocked");
-    testCoordsFromZip();
-  });
-} */
-
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 

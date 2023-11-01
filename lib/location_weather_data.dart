@@ -31,6 +31,26 @@ class LocationWeatherData {
     }
   }
 
+  void weatherPointToForecast(WeatherPoint weatherPoint) async {
+    Forecast? newForecast;
+    newForecast = await APIManager().getForecast(weatherPoint);
+    if (newForecast == null) {
+      print("Error with Forecast call");
+    } else {
+      forecast = newForecast;
+    }
+  }
+
+  void weatherPointToHourlyForecast(WeatherPoint weatherPoint) async {
+    HourlyForecast? newHourlyForecast;
+    newHourlyForecast = await APIManager().getHourlyForecast(weatherPoint);
+    if (newHourlyForecast == null) {
+      print("Error with Forecast call");
+    } else {
+      hourlyForecast = newHourlyForecast;
+    }
+  }
+
   void setCity(WeatherPoint weatherPointData) {
     city = weatherPointData.properties?.relativeLocation?.properties?.city;
   }
