@@ -7,6 +7,10 @@ import 'api_manager.dart';
 HashMap<String, WeatherPoint> locationMap = HashMap();
 testWeatherPoint() async {
   final weatherPointAPIResult = await APIManager().getWeatherPoint();
+  if (weatherPointAPIResult == null) {
+    return;
+    //Show an Error and refresh button?
+  }
   testWeatherPointPrintouts(weatherPointAPIResult);
   locationMap[weatherPointAPIResult.properties?.gridId as String] =
       weatherPointAPIResult;
@@ -43,21 +47,20 @@ void testHourlyForecast() async {
 
 void testCoordsFromZip() async {
   String zip = "91340";
-  Location? help;
+  Location? locationData;
   locationMap.forEach((key, value) async {
-    help = await APIManager().getCoordinatesFromZip(zip);
+    locationData = await APIManager().getCoordinates(zip);
     print(
-        "COORDINATES FROM ZIP $zip   ARE:${help?.latitude} , ${help?.longitude}");
+        "COORDINATES FROM ZIP $zip   ARE:${locationData?.latitude} , ${locationData?.longitude}");
   });
 }
 
 void testCoordsFromCityState() async {
-  print("Hello?");
   String cityState = "Berkeley California";
-  Location? help;
+  Location? locationData;
   locationMap.forEach((key, value) async {
-    help = await APIManager().getCoordinatesFromZip(cityState);
+    locationData = await APIManager().getCoordinates(cityState);
     print(
-        "COORDINATES FROM city,State $cityState   ARE:${help?.latitude} , ${help?.longitude}");
+        "COORDINATES FROM city,State $cityState   ARE:${locationData?.latitude} , ${locationData?.longitude}");
   });
 }

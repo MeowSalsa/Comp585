@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:http/http.dart' as http;
 /* Additionally, in your AndroidManifest.xml file, add the Internet permission.
@@ -393,11 +392,19 @@ class APIManager {
   final String testLat = "34.2406756";
   final String testLong = "-118.5325945";
 
+  static bool weatherPointLock = false;
+  static bool forecastLock = false;
+  static bool hourlyForecastLock = false;
+  static bool getCoordinatesLock = false;
+
   ///  Uses two coordinates to make a call to National Weather API
   ///  to retrieve the id, gridId, gridX, gridY.
   ///
   /// Needs latitude and longitude strings to make the call.
-  Future<WeatherPoint> getWeatherPoint() async {
+  Future<WeatherPoint?> getWeatherPoint() async {
+    if (weatherPointLock) {
+      return Future(() => null);
+    }
     final response = await http
         .get(Uri.parse('https://api.weather.gov/points/$testLat,$testLong'));
 
@@ -451,17 +458,25 @@ class APIManager {
     }
   }
 
-  Future<Location?> getCoordinatesFromZip(String location) async {
-    final response = await http.get(Uri.parse(
-        "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=AIzaSyDeKwo1CHHgV09Jfh-MVGxHzpvKWDXr-vQ"));
-    if (response.statusCode == 200) {
-      print("Geocode Location->Coord HTTP: Success");
-      final data = jsonDecode(response.body);
-      //print(data);
-      final newCoord = CoordinatesFromZip.fromJson(data);
-      return newCoord.results?[0].geometry?.location;
+  Future<Location?> getCoordinates(String location) async {
+    if (getCoordinatesLock) {
+      print("getCoordinates is locked");
+      return Future(() => null);
     } else {
-      throw Exception('Geocode Location->Coord HTTP: Fail');
+      getCoordinatesLock = true;
+      final response = await http.get(Uri.parse(
+          "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=AIzaSyDeKwo1CHHgV09Jfh-MVGxHzpvKWDXr-vQ"));
+      if (response.statusCode == 200) {
+        print("Geocode Location->Coord HTTP: Success");
+        final data = jsonDecode(response.body);
+        //print(data);
+        final newCoord = CoordinatesFromZip.fromJson(data);
+        getCoordinatesLock = false;
+        return newCoord.results?[0].geometry?.location;
+      } else {
+        getCoordinatesLock = false;
+        throw Exception('Geocode Location->Coord HTTP: Fail');
+      }
     }
   }
 

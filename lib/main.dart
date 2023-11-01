@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:weather_app/tests.dart';
-import 'api_manager.dart';
+//import 'api_manager.dart';
 
 void main() {
   runTests();
@@ -12,21 +12,23 @@ void main() {
 void runTests() {
   print(DateTime.now());
   testWeatherPoint();
-  Future.delayed(const Duration(seconds: 1), () {
+  Future.delayed(const Duration(seconds: 2), () {
     print("Starting Forecast Test");
     print(DateTime.now());
     testForecast();
   });
-  Future.delayed(Duration(seconds: 1), () {
+  Future.delayed(const Duration(seconds: 2), () {
     print("Starting Hourly Forecast Test");
     testHourlyForecast();
   });
-  Future.delayed(Duration(seconds: 1), () {
+  Future.delayed(const Duration(seconds: 2), () {
     print("Starting Coordinates from City,State");
     testCoordsFromCityState();
+    print("Starting coordinates from zip iniside city,state");
+    testCoordsFromZip();
   });
-  Future.delayed(Duration(seconds: 1), () {
-    print("Starting Coordinates from City,State");
+  Future.delayed(const Duration(seconds: 5), () {
+    print("Starting Coordinates from City,State NOTE mutex should be unlocked");
     testCoordsFromZip();
   });
 }
