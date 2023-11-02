@@ -7,8 +7,6 @@ class CurrentWeatherDisplay extends StatelessWidget {
 
   String? formatPrecipitation(ProbabilityOfPrecipitation? p)
   {
-    print(p?.value);
-    print(p?.unitCode);
     String? displayString = "";
 
     if (p!.value == null)
@@ -41,7 +39,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
     String? currentPrecipitationChance;
     String? currentHumidity;
 
-    Future<WeatherPoint> getCurrentWeather() async {
+    Future<void> getCurrentWeather() async {
 
       var currentWeatherPoint = await APIManager().getWeatherPoint();
       Forecast forecast = await APIManager().getForecast(currentWeatherPoint);
@@ -60,8 +58,6 @@ class CurrentWeatherDisplay extends StatelessWidget {
       currentPrecipitationChance = formatPrecipitation(precipitation);
       
       currentHumidity = formatPrecipitation(humidity);
-
-      return currentWeatherPoint;
     }
     
     return Scaffold(
@@ -70,7 +66,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
           future: getCurrentWeather(),
           builder: (context, snapshot) {
 
-            if(!snapshot.hasData){
+            if(snapshot.hasError){
               return const CircularProgressIndicator();
             }
 
@@ -100,30 +96,33 @@ class CurrentWeatherDisplay extends StatelessWidget {
                   ),
                 ),
 
-
                 // MINOR WEATHER DISPLAY
-                Text(
-                  "$currentWindSpeed $currentWindDirection",
-                  style: const TextStyle(
-                    fontSize: 32,
-                  ),
-                ),
-                Text(
-                  "$currentPrecipitationChance",
-                  style: const TextStyle(
-                    fontSize: 32,
-                  ),
-                ),
-                Text(
-                  "$currentHumidity",
-                  style: const TextStyle(
-                    fontSize: 32,
-                  ),
-                ),
+                MinorWeatherDisplay(displayText: "$currentWindSpeed $currentWindDirection",),
+                MinorWeatherDisplay(displayText: "$currentPrecipitationChance",),
+                MinorWeatherDisplay(displayText: "$currentHumidity",),
               ],
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+class MinorWeatherDisplay extends StatelessWidget {
+
+  final String? displayText;
+
+  const MinorWeatherDisplay({
+    this.displayText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      displayText!,
+      style: const TextStyle(
+        fontSize: 32,
       ),
     );
   }
