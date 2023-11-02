@@ -1,65 +1,68 @@
+// ignore_for_file: avoid_print
+
 import 'package:weather_app/api_manager.dart';
 
 class LocationWeatherData {
   String? city;
   String? state;
   String? zip;
-  WeatherPoint? weatherPoint;
+  WeatherPoint? weatherPointData;
   Forecast? forecast;
   HourlyForecast? hourlyForecast;
 
   LocationWeatherData(String location) {
     print("Creating new location");
-    _locationToWeatherPoint(location);
+    locationToWeatherPoint(location);
   }
 
-  void _locationToWeatherPoint(String location) async {
+  void locationToWeatherPoint(String location) async {
     Location? locationData;
     locationData = await APIManager().getCoordinates("91340");
     if (locationData == null) {
       print("Geolocation Error. Try again.");
     } else {
-      WeatherPoint? weatherPointData;
+      //WeatherPoint? weatherPointData;
       weatherPointData = await APIManager().getWeatherPoint(locationData);
+      //weatherPoint = weatherPointData;
       if (weatherPointData == null) {
         print("weather point data error");
       } else {
         _setCity(weatherPointData);
-        state =
-            weatherPointData.properties?.relativeLocation?.properties?.state;
+        _setState(weatherPointData);
       }
     }
   }
 
-  void _weatherPointToForecast(WeatherPoint weatherPoint) async {
+  Future<Forecast> weatherPointToForecast() async {
     Forecast? newForecast;
-    newForecast = await APIManager().getForecast(weatherPoint);
-    if (newForecast == null) {
-      print("Error with Forecast call");
-    } else {
-      forecast = newForecast;
-    }
+    //print("Continue or wait?");
+    newForecast = await APIManager().getForecast(weatherPointData!);
+    //print("Does this continue or wait?");
+    forecast = newForecast;
+    return newForecast;
   }
 
-  void _weatherPointToHourlyForecast(WeatherPoint weatherPoint) async {
+  Future<HourlyForecast> weatherPointToHourlyForecast() async {
     HourlyForecast? newHourlyForecast;
-    newHourlyForecast = await APIManager().getHourlyForecast(weatherPoint);
-    if (newHourlyForecast == null) {
-      print("Error with Forecast call");
-    } else {
-      hourlyForecast = newHourlyForecast;
-    }
+    newHourlyForecast = await APIManager().getHourlyForecast(weatherPointData!);
+    hourlyForecast = newHourlyForecast;
+    return newHourlyForecast;
   }
 
-  void _setCity(WeatherPoint weatherPointData) {
-    city = weatherPointData.properties?.relativeLocation?.properties?.city;
+  void _setCity(WeatherPoint? weatherPointData) {
+    city = weatherPointData?.properties?.relativeLocation?.properties?.city;
   }
 
-  Forecast? getForecast() async {
+  void _setState(WeatherPoint? weatherPointData) {
+    state = weatherPointData?.properties?.relativeLocation?.properties?.state;
+  }
+  /*  Future<Forecast?> getForecast() async {
+    print("Current weatherpoint  $weatherPointData");
     if (forecast == null) {
-      await _weatherPointToForecast(weatherPoint!);
+      Forecast? newForecast = await weatherPointToForecast(weatherPointData);
+      forecast = newForecast;
       return forecast;
     }
     return forecast;
-  }
+  } */
 }
