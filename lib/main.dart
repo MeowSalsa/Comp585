@@ -2,15 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+// void main() {
+//   runApp(const MyApp());
+// }
 
 // Mock function to simulate fetching weather details for a city
+// Future<String> fetchWeatherDetails(String city) async {
+// In reality, you'd make an API call here and get the details for the city.
+//   await Future.delayed(const Duration(seconds: 1)); // Simulating network delay
+//   return "Weather details for $city"; // Placeholder text
+// }
+
+void main() {
+  runApp(const RootApp());
+}
+
+class RootApp extends StatelessWidget {
+  const RootApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: MyApp(),
+    );
+  }
+}
+
 Future<String> fetchWeatherDetails(String city) async {
-  // In reality, you'd make an API call here and get the details for the city.
-  await Future.delayed(const Duration(seconds: 1)); // Simulating network delay
-  return "Weather details for $city"; // Placeholder text
+  await Future.delayed(const Duration(seconds: 1));
+  return "Weather details for $city";
 }
 
 class DetailScreen extends StatefulWidget {
@@ -54,53 +74,62 @@ class _DetailScreenState extends State<DetailScreen> {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final TextEditingController _controller = TextEditingController();
+
+  MyApp({super.key}); // Step 1
 
   @override
   Widget build(BuildContext context) {
     String formattedDate = DateFormat('EEEE, MMMM d, y').format(DateTime.now());
 
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.lightBlue[50], // Light sky blue background
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(70.0),
-          child: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            title: Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                  hintText: 'Search',
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                    borderSide: BorderSide.none,
-                  ),
+    return Scaffold(
+      backgroundColor: Colors.lightBlue[50],
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(70.0),
+        child: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: TextField(
+              controller: _controller, // set the controller for the TextField
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.grey[200],
+                hintText: 'Search',
+                prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                  borderSide: BorderSide.none,
                 ),
               ),
+              onSubmitted: (value) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailScreen(city: _controller.text),
+                  ),
+                );
+              },
             ),
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  formattedDate, // this variable holds today's formatted date
-                  style: const TextStyle(
-                      fontSize: 24.0, fontWeight: FontWeight.bold),
-                ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                formattedDate,
+                style: const TextStyle(
+                    fontSize: 24.0, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 10.0),
-              const Expanded(child: CurvedSquareIcon()),
-            ],
-          ),
+            ),
+            const SizedBox(height: 10.0),
+            const Expanded(child: CurvedSquareIcon()),
+          ],
         ),
       ),
     );
@@ -145,44 +174,52 @@ class CurvedSquareIcon extends StatelessWidget {
 
   Widget _buildWeatherBox(BuildContext context, String city, String temperature,
       String weather, IconData icon, Color iconColor) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => DetailScreen(city: city)),
-          );
-        },
-        child: Container(
-          width: 150.0,
-          height: 150.0,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min, // Adjust the main axis size
-              children: [
-                Text(city,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 14)),
-                const SizedBox(height: 5),
-                Icon(icon, size: 40, color: iconColor),
-                const SizedBox(height: 5),
-                Text(temperature,
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 5),
-                Text(weather, style: const TextStyle(fontSize: 12)),
-              ],
+    return Builder(builder: (BuildContext innerContext) {
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              innerContext,
+              MaterialPageRoute(
+                builder: (context) => DetailScreen(city: city),
+              ),
+            );
+          },
+          child: Container(
+            width: 150.0,
+            height: 150.0,
+            decoration: BoxDecoration(
+              // color: Colors.transparent,
+              // borderRadius: BorderRadius.circular(15.0),
+              // border:
+              //     Border.all(color: Colors.white.withOpacity(0.5), width: 1.0),
+              color: Colors.grey.withOpacity(0.3), // 0.5 means 50% opacity
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min, // Adjust the main axis size
+                children: [
+                  Text(city,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 14)),
+                  const SizedBox(height: 5),
+                  Icon(icon, size: 40, color: iconColor),
+                  const SizedBox(height: 5),
+                  Text(temperature,
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 5),
+                  Text(weather, style: const TextStyle(fontSize: 12)),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
