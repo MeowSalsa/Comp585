@@ -1,29 +1,16 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
-import 'package:weather_app/data_manager.dart';
+
 import 'package:weather_app/tests.dart';
+
+import 'package:weather_app/data_manager.dart';
 import 'api_manager.dart';
 import 'location_weather_data.dart';
+import 'tests.dart';
 
 void main() {
-  //runTests();
-  LocationWeatherData newLocation = LocationWeatherData("91340");
-  Future.delayed(const Duration(seconds: 10), () {
-    print("Getting forecast but WP is ${newLocation.weatherPointData}");
-    DataManager.getForecast(newLocation);
-  });
-  Future.delayed(const Duration(seconds: 15), () {
-    print("Getting hourly forecast but WP is ${newLocation.weatherPointData}");
-    DataManager.getHourlyForecast(newLocation);
-  });
-  Future.delayed(const Duration(seconds: 15), () {
-    print("Printing Data class stuff");
-    print(newLocation.city);
-    print(newLocation.state);
-    print(newLocation.forecast?.properties?.periods?.length);
-    print(newLocation.hourlyForecast?.properties?.periods?.length);
-  });
+  apiSystemTest();
   runApp(const MainApp());
 }
 

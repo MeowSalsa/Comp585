@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+
 /* Additionally, in your AndroidManifest.xml file, add the Internet permission.
     <!-- Required to fetch data from the internet. -->
     <uses-permission android:name="android.permission.INTERNET" /> */
@@ -317,13 +318,13 @@ class HourlyProbabilityOfPrecipitation {
 
 //Geocoding: Coordinates from zip code
 
-class CoordinatesFromZip {
+class CoordinatesFromLocation {
   List<Results>? results;
   String? status;
 
-  CoordinatesFromZip({this.results, this.status});
+  CoordinatesFromLocation({this.results, this.status});
 
-  CoordinatesFromZip.fromJson(Map<String, dynamic> json) {
+  CoordinatesFromLocation.fromJson(Map<String, dynamic> json) {
     if (json['results'] != null) {
       results = <Results>[];
       json['results'].forEach((v) {
@@ -335,14 +336,15 @@ class CoordinatesFromZip {
 }
 
 class Results {
-  //String? formattedAddress;
+  List<AddressComponents>? addressComponents;
+  String? formattedAddress;
   Geometry? geometry;
 /*   String? placeId;
   List<String>? postcodeLocalities;
   List<String>? types; */
 
   Results({
-    //this.formattedAddress,
+    this.formattedAddress,
     this.geometry,
     /* this.placeId,
       this.postcodeLocalities,
@@ -350,12 +352,40 @@ class Results {
   });
 
   Results.fromJson(Map<String, dynamic> json) {
-    //formattedAddress = json['formatted_address'];
+    if (json['address_components'] != null) {
+      addressComponents = <AddressComponents>[];
+      json['address_components'].forEach((v) {
+        addressComponents!.add(AddressComponents.fromJson(v));
+      });
+    }
+    formattedAddress = json['formatted_address'];
     geometry =
         json['geometry'] != null ? Geometry.fromJson(json['geometry']) : null;
     //placeId = json['place_id'];
     //postcodeLocalities = json['postcode_localities'].cast<String>();
     //types = json['types'].cast<String>();
+  }
+}
+
+class AddressComponents {
+  String? longName;
+  String? shortName;
+  List<String>? types;
+
+  AddressComponents({this.longName, this.shortName, this.types});
+
+  AddressComponents.fromJson(Map<String, dynamic> json) {
+    longName = json['long_name'];
+    shortName = json['short_name'];
+    types = json['types'].cast<String>();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['long_name'] = this.longName;
+    data['short_name'] = this.shortName;
+    data['types'] = this.types;
+    return data;
   }
 }
 
@@ -388,10 +418,6 @@ class Location {
 ///and returning the appropriate object that can hold the data required for the
 ///application.
 class APIManager {
-  //Debugging: Coordinates for CSUN.
-  final String testLat = "34.2406756";
-  final String testLong = "-118.5325945";
-
   ///  Uses two coordinates to make a call to National Weather API
   ///  to retrieve the id, gridId, gridX, gridY.
   ///
@@ -452,15 +478,16 @@ class APIManager {
     }
   }
 
-  Future<Location?> getCoordinates(String location) async {
+  Future<CoordinatesFromLocation?> getCoordinatesFromLocation(
+      String location) async {
     final response = await http.get(Uri.parse(
         "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=AIzaSyDeKwo1CHHgV09Jfh-MVGxHzpvKWDXr-vQ"));
     if (response.statusCode == 200) {
       print("Geocode Location->Coord HTTP: Success");
       final data = jsonDecode(response.body);
       //print(data);
-      final newCoord = CoordinatesFromZip.fromJson(data);
-      return newCoord.results?[0].geometry?.location;
+      final newCoord = CoordinatesFromLocation.fromJson(data);
+      return newCoord;
     } else {
       //return a null location instead. Prevents stack from being thrown out
       print("Geocode Location->Coord HTTP: Fail");

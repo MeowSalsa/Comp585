@@ -2,6 +2,9 @@
 
 import 'dart:collection';
 
+import 'package:weather_app/data_manager.dart';
+import 'package:weather_app/location_weather_data.dart';
+
 import 'api_manager.dart';
 
 /* HashMap<String, WeatherPoint> locationMap = HashMap();
@@ -70,3 +73,13 @@ testWeatherPoint() async {
   });
 }
  */
+
+void apiSystemTest() async {
+  DataManager newDM = DataManager();
+  LocationWeatherData newLocation = await newDM.searchForLocation("91331");
+  print("NewLocation displable String ${newLocation.displayableString}");
+  HourlyForecast temp =
+      await newDM.getForecast(newLocation, ForecastType.hourly);
+  print(
+      "Test: ${newLocation.displayableString} has ${temp.properties?.periods?.length} periods in hourly forecast");
+}
