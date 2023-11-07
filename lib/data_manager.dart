@@ -91,6 +91,10 @@ class DataManager {
 
   Future<LocationWeatherData> searchForLocation(String stringInput) async {
     print("Entered 'SearchForLocation'");
+    if (_recentSearches.containsKey(stringInput)) {
+      print("Already in map, returning previous entry");
+      return _recentSearches[stringInput]!;
+    }
     LocationWeatherData newLocation = LocationWeatherData(stringInput);
     await newLocation.initializeLocation();
     _recentSearches[stringInput] = newLocation;

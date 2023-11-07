@@ -82,4 +82,6 @@ void apiSystemTest() async {
       await newDM.getForecast(newLocation, ForecastType.hourly);
   print(
       "Test: ${newLocation.displayableString} has ${temp.properties?.periods?.length} periods in hourly forecast");
+  var test2 = await newDM.searchForLocation("91331");
+  print("Test 2 DS ${test2.displayableString}");
 }
