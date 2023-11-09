@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
 
 import 'api_manager.dart';
+import 'data_manager.dart';
+import 'location_weather_data.dart';
 
 class CurrentWeatherDisplay extends StatelessWidget {
+
+  final String locationString;
+
+  const CurrentWeatherDisplay({
+    required this.locationString,
+  });
 
   String? formatPrecipitation(ProbabilityOfPrecipitation? p)
   {
@@ -41,10 +48,11 @@ class CurrentWeatherDisplay extends StatelessWidget {
 
     Future<void> getCurrentWeather() async {
 
-      var currentWeatherPoint = await APIManager().getWeatherPoint();
-      Forecast forecast = await APIManager().getForecast(currentWeatherPoint);
-      RelativeLocation? currentLocation = currentWeatherPoint.properties!.relativeLocation;
-      Periods currentPeriod = forecast.properties!.periods![0];
+      DataManager newDM = DataManager();
+      LocationWeatherData weatherLocation = await newDM.searchForLocation(locationString);
+      HourlyForecast forecast = await newDM.getForecast(weatherLocation, ForecastType.hourly);
+      RelativeLocation? currentLocation = weatherLocation.weatherPointData!.properties!.relativeLocation;
+      HourlyPeriods currentPeriod = forecast.properties!.periods![0];
       ProbabilityOfPrecipitation? precipitation = currentPeriod.probabilityOfPrecipitation;
       ProbabilityOfPrecipitation? humidity = currentPeriod.relativeHumidity;
 
