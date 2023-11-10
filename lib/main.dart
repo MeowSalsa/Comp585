@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -12,6 +14,13 @@ import 'package:intl/intl.dart';
 //   await Future.delayed(const Duration(seconds: 1)); // Simulating network delay
 //   return "Weather details for $city"; // Placeholder text
 // }
+
+import 'package:weather_app/tests.dart';
+
+import 'package:weather_app/data_manager.dart';
+import 'api_manager.dart';
+import 'location_weather_data.dart';
+import 'tests.dart';
 
 void main() {
   runApp(const RootApp());
