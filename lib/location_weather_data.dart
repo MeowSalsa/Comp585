@@ -52,7 +52,7 @@ class LocationWeatherData {
       //init weatherpoint
       weatherPointData = await APIManager().getWeatherPoint(location!);
     } else {
-      print("Error at location initialization");
+      print("Error at location initialization in Data Manager");
     }
   }
 

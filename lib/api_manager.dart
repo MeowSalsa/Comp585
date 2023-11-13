@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -424,70 +425,98 @@ class APIManager {
   Future<WeatherPoint?> getWeatherPoint(Location locationData) async {
     var lat = locationData.latitude;
     var long = locationData.longitude;
-    final response =
-        await http.get(Uri.parse('https://api.weather.gov/points/$lat,$long'));
+    try {
+      final response = await http
+          .get(Uri.parse('https://api.weather.gov/points/$lat,$long'))
+          .timeout(const Duration(seconds: 10));
 
-    if (response.statusCode == 200) {
-      print("WeatherPoint HTTP: Success");
-      final data = jsonDecode(response.body);
-      //print(data);
-      final newWeatherPoint = WeatherPoint.fromJson(data);
-      return newWeatherPoint;
-    } else {
-      throw Exception('WeatherPoint HTTP: Fail');
+      if (response.statusCode == 200) {
+        print("WeatherPoint HTTP: Success.");
+        final data = jsonDecode(response.body);
+        //print(data);
+        final newWeatherPoint = WeatherPoint.fromJson(data);
+        return newWeatherPoint;
+      } else {
+        print("WeatherPoint HTTP: Fail.");
+        return null;
+      }
+    } on TimeoutException {
+      print("WeatherPoint HTTP: Timed out.");
+      return null;
     }
   }
 
   /// Uses the gridID, gridX, gridY to get the weather information for the requested
   /// area.
-  Future<Forecast> getForecast(WeatherPoint currentWeatherPoint) async {
+  Future<Forecast?> getForecast(WeatherPoint currentWeatherPoint) async {
     String? gridX = currentWeatherPoint.properties?.gridX.toString();
     String? gridY = currentWeatherPoint.properties?.gridY.toString();
-    final response = await http.get(Uri.parse(
-        "https://api.weather.gov/gridpoints/${currentWeatherPoint.properties?.gridId}/$gridX,$gridY/forecast"));
-
-    if (response.statusCode == 200) {
-      print("Forecast HTTP: Success");
-      final data = jsonDecode(response.body);
-      //print(data);
-      final newForecast = Forecast.fromJson(data);
-      return newForecast;
-    } else {
-      throw Exception('Forecast HTTP: Fail');
+    try {
+      final response = await http
+          .get(Uri.parse(
+              "https://api.weather.gov/gridpoints/${currentWeatherPoint.properties?.gridId}/$gridX,$gridY/forecast"))
+          .timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200) {
+        print("Forecast HTTP: Success");
+        final data = jsonDecode(response.body);
+        final newForecast = Forecast.fromJson(data);
+        return newForecast;
+      } else {
+        print("Forecast HTTP: Fail.");
+        return null;
+      }
+    } on TimeoutException {
+      print("Forecast HTTP: Timed out.");
+      return null;
     }
   }
 
-  Future<HourlyForecast> getHourlyForecast(WeatherPoint currentWeatherPoint) async {
+  Future<HourlyForecast?> getHourlyForecast(
+      WeatherPoint currentWeatherPoint) async {
     String? gridX = currentWeatherPoint.properties?.gridX.toString();
     String? gridY = currentWeatherPoint.properties?.gridY.toString();
-    print(
-        "https://api.weather.gov/gridpoints/${currentWeatherPoint.properties?.gridId}/$gridX,$gridY/forecast/hourly");
-    final response = await http.get(Uri.parse(
-        "https://api.weather.gov/gridpoints/${currentWeatherPoint.properties?.gridId}/$gridX,$gridY/forecast/hourly"));
-
-    if (response.statusCode == 200) {
-      print("Hourly Forecast HTTP: Success");
-      final data = jsonDecode(response.body);
-      //print(data);
-      final newForecast = HourlyForecast.fromJson(data);
-      return newForecast;
-    } else {
-      throw Exception('Hourly Forecast HTTP: Fail');
+    // print("https://api.weather.gov/gridpoints/${currentWeatherPoint.properties?.gridId}/$gridX,$gridY/forecast/hourly");
+    try {
+      final response = await http
+          .get(Uri.parse(
+              "https://api.weather.gov/gridpoints/${currentWeatherPoint.properties?.gridId}/$gridX,$gridY/forecast/hourly"))
+          .timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200) {
+        print("Hourly Forecast HTTP: Success.");
+        final data = jsonDecode(response.body);
+        //print(data);
+        final newForecast = HourlyForecast.fromJson(data);
+        return newForecast;
+      } else {
+        print("Hourly Forecast HTTP: Failed.");
+        return null;
+      }
+    } on TimeoutException {
+      print("Hourly Forecast HTTP: Timed out.");
+      return null;
     }
   }
 
-  Future<CoordinatesFromLocation?> getCoordinatesFromLocation(String location) async {
-    final response = await http.get(Uri.parse(
-        "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=AIzaSyDeKwo1CHHgV09Jfh-MVGxHzpvKWDXr-vQ"));
-    if (response.statusCode == 200) {
-      print("Geocode Location->Coord HTTP: Success");
-      final data = jsonDecode(response.body);
-      //print(data);
-      final newCoord = CoordinatesFromLocation.fromJson(data);
-      return newCoord;
-    } else {
-      //return a null location instead. Prevents stack from being thrown out
-      print("Geocode Location->Coord HTTP: Fail");
+  Future<CoordinatesFromLocation?> getCoordinatesFromLocation(
+      String location) async {
+    try {
+      final response = await http
+          .get(Uri.parse(
+              "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=AIzaSyDeKwo1CHHgV09Jfh-MVGxHzpvKWDXr-vQ"))
+          .timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200) {
+        print("Geocode Location->Coord HTTP: Success.");
+        final data = jsonDecode(response.body);
+        //print(data);
+        final newCoord = CoordinatesFromLocation.fromJson(data);
+        return newCoord;
+      } else {
+        //return a null location instead. Prevents stack from being thrown out
+        print("Geocode HTTP: Fail.");
+        return null;
+      }
+    } on TimeoutException {
+      print("Geocode HTTP: Timed out.");
       return null;
     }
   }

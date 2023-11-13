@@ -79,8 +79,6 @@ void apiSystemTest() async {
   LocationWeatherData newLocation = await newDM.searchForLocation("91331");
   print("NewLocation displable String ${newLocation.displayableString}");
   var temp = await newDM.getForecast(newLocation, ForecastType.daily);
-  print(      "Test: ${newLocation.displayableString} has ${temp.properties?.periods?.length} periods in hourly forecast");
-  var test2 = await newDM.searchForLocation("91331");
-  print("Test 2 DS ${test2.displayableString}");
+  print("Test: ${newLocation.displayableString} has high of ${temp[0].temperature} and low of ${temp[1].temperature}");
 
 }
