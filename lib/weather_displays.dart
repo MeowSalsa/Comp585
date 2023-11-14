@@ -24,11 +24,15 @@ class MinorWeatherDisplay extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children:[
-              Text(
-                "$titleText",
-                textAlign: TextAlign.left,
-                style: const TextStyle(
-                  fontSize: 32,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child:
+                Text(
+                  "$titleText",
+                  textAlign: TextAlign.left,
+                  style: const TextStyle(
+                    fontSize: 32,
+                  ),
                 ),
               ),
 
@@ -66,5 +70,35 @@ class WindDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MinorWeatherDisplay(titleText: "WIND", displayText: "$windSpeed $windDirection",);
+  }
+}
+
+class PrecipitationDisplay extends StatelessWidget {
+  
+  final String? precipitationChance;
+
+  const PrecipitationDisplay({
+    super.key,
+    required this.precipitationChance,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MinorWeatherDisplay(titleText: "PRECIPITATION", displayText: "$precipitationChance",);
+  }
+}
+
+class HumidityDisplay extends StatelessWidget {
+  
+  final String? humidityPercent;
+
+  const HumidityDisplay({
+    super.key,
+    required this.humidityPercent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MinorWeatherDisplay(titleText: "HUMIDITY", displayText: "$humidityPercent",);
   }
 }
