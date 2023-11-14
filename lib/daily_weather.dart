@@ -75,8 +75,8 @@ class CurrentWeatherDisplay extends StatelessWidget {
 
       minorWeatherDisplays = [
         WindDisplay(windSpeed: currentWindSpeed, windDirection: currentWindDirection,),
-        MinorWeatherDisplay(displayText: "$currentPrecipitationChance",),
-        MinorWeatherDisplay(displayText: "$currentHumidity",),
+        PrecipitationDisplay(precipitationChance: currentPrecipitationChance,),
+        HumidityDisplay(humidityPercent: currentHumidity,),
       ];
     }
     
@@ -91,32 +91,44 @@ class CurrentWeatherDisplay extends StatelessWidget {
         return Scaffold(
           backgroundColor: const Color(0xFF699EEE),
 
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            toolbarHeight: 75,
-            flexibleSpace: Container(
-              padding: const EdgeInsets.all(20.0),
-
-              child: Text(
-                "$currentCity, $currentState",
-                style: const TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-
           body: Center(
             child: ListView(
               shrinkWrap: true,
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 30.0, top: 30.0),
+
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      FittedBox(
+                        fit: BoxFit.cover,
+                        child: Text(
+                          "$currentCity, $currentState",
+                          style: const TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
+                      const Padding(padding: EdgeInsets.only(top: 100)),
 
+                      // MAJOR WEATHER DISPLAY
+                      Container(
+                        padding: const EdgeInsets.all(20.0),
+                        child: const Icon(
+                          Icons.sunny,
+                          color: Color(0xFFFFF386),
+                          size: 300.0,
+                        ),
+                      ),
                       Text(
                         "$currentTemp\u00B0$currentUnits",
                         style: const TextStyle(
@@ -131,27 +143,34 @@ class CurrentWeatherDisplay extends StatelessWidget {
                         ),
                       ),
 
-                      Column(
-                    children: [
-                      LayoutBuilder(
-                        builder: (BuildContext context, BoxConstraints constraints) {
-                          const crossAxisCount = 2;
+                      const Padding(padding: EdgeInsets.only(top: 100)),
 
-                          return GridView.builder(
-                            shrinkWrap: true,
-                            itemCount: minorWeatherDisplays!.length,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: 1, crossAxisCount: crossAxisCount),
-                            itemBuilder: (BuildContext context, int index) {
-                              return minorWeatherDisplays![index];
-                            }
-                          );
-                        }
+                      // MINOR WEATHER DISPLAYS
+                      Card(
+                        color: const Color(0xFF97D3BD),
+                        margin: EdgeInsets.zero,
+                        child: Column(
+                          children: [
+                            LayoutBuilder(
+                              builder: (BuildContext context, BoxConstraints constraints) {
+                                const crossAxisCount = 2;
+
+                                return GridView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: minorWeatherDisplays!.length,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: 1, crossAxisCount: crossAxisCount),
+                                  itemBuilder: (BuildContext context, int index) {
+                                    return minorWeatherDisplays![index];
+                                  }
+                                );
+                              }
+                            ),
+
+                            const Text("hello",),
+                          ],
+                        ),
                       ),
-
-                      const Text("hello",),
-                    ],
-                  ),
                     ],
                   ),
                 ),
