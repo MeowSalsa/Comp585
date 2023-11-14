@@ -48,7 +48,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
     String? currentPrecipitationChance;
     String? currentHumidity;
 
-    List<MinorWeatherDisplay>? minorWeatherDisplays;
+    List<Widget>? minorWeatherDisplays;
 
     Future<void> getCurrentWeather() async {
 
@@ -68,76 +68,98 @@ class CurrentWeatherDisplay extends StatelessWidget {
       
       currentWindSpeed = currentPeriod.windSpeed;
       currentWindDirection = currentPeriod.windDirection;
+
       currentPrecipitationChance = formatPrecipitation(precipitation);
       
       currentHumidity = formatPrecipitation(humidity);
 
       minorWeatherDisplays = [
-        MinorWeatherDisplay(displayText: "$currentWindSpeed $currentWindDirection",),
+        WindDisplay(windSpeed: currentWindSpeed, windDirection: currentWindDirection,),
         MinorWeatherDisplay(displayText: "$currentPrecipitationChance",),
         MinorWeatherDisplay(displayText: "$currentHumidity",),
       ];
     }
     
-    return Scaffold(
-      backgroundColor: const Color(0xFF699EEE),
-      body: Center(
-        child: FutureBuilder(
-          future: getCurrentWeather(),
-          builder: (context, snapshot) {
+    return FutureBuilder(
+      future: getCurrentWeather(),
+      builder: (context, snapshot) {
 
-            if(snapshot.hasError || minorWeatherDisplays == null){
-              return const CircularProgressIndicator();
-            }
+        if(snapshot.hasError || minorWeatherDisplays == null){
+          return const CircularProgressIndicator();
+        }
 
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+        return Scaffold(
+          backgroundColor: const Color(0xFF699EEE),
+
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            toolbarHeight: 75,
+            flexibleSpace: Container(
+              padding: const EdgeInsets.all(20.0),
+
+              child: Text(
+                "$currentCity, $currentState",
+                style: const TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+
+          body: Center(
+            child: ListView(
+              shrinkWrap: true,
               children: [
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
 
-                // MAJOR WEATHER DISPLAY
-                Text(
-                  "$currentCity, $currentState",
-                  style: const TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  "$currentTemp\u00B0$currentUnits",
-                  style: const TextStyle(
-                    fontSize: 96,
-                  ),
-                ),
-                Text(
-                  "$currentCond",
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                      Text(
+                        "$currentTemp\u00B0$currentUnits",
+                        style: const TextStyle(
+                          fontSize: 96,
+                        ),
+                      ),
+                      Text(
+                        "$currentCond",
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
 
-                // MINOR WEATHER DISPLAY
-                Flexible(
-                  child: LayoutBuilder(
-                    builder: (BuildContext context, BoxConstraints constraints) {
-                      const crossAxisCount = 2;
+                      Column(
+                    children: [
+                      LayoutBuilder(
+                        builder: (BuildContext context, BoxConstraints constraints) {
+                          const crossAxisCount = 2;
 
-                      return GridView.builder(
-                        itemCount: minorWeatherDisplays!.length,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: 1, crossAxisCount: crossAxisCount),
-                        itemBuilder: (BuildContext context, int index) {
-                          return minorWeatherDisplays![index];
+                          return GridView.builder(
+                            shrinkWrap: true,
+                            itemCount: minorWeatherDisplays!.length,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: 1, crossAxisCount: crossAxisCount),
+                            itemBuilder: (BuildContext context, int index) {
+                              return minorWeatherDisplays![index];
+                            }
+                          );
                         }
-                      );
-                    }
-                  )
+                      ),
+
+                      const Text("hello",),
+                    ],
+                  ),
+                    ],
+                  ),
                 ),
               ],
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
