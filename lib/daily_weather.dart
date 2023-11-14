@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'api_manager.dart';
 import 'data_manager.dart';
 import 'location_weather_data.dart';
+import 'weather_displays.dart';
 
 class CurrentWeatherDisplay extends StatelessWidget {
 
   final String locationString;
 
   const CurrentWeatherDisplay({
+    super.key,
     required this.locationString,
   });
 
@@ -46,6 +48,8 @@ class CurrentWeatherDisplay extends StatelessWidget {
     String? currentPrecipitationChance;
     String? currentHumidity;
 
+    List<MinorWeatherDisplay>? minorWeatherDisplays;
+
     Future<void> getCurrentWeather() async {
 
       DataManager newDM = DataManager();
@@ -61,20 +65,28 @@ class CurrentWeatherDisplay extends StatelessWidget {
       currentTemp = currentPeriod.temperature;
       currentUnits = currentPeriod.temperatureUnit;
       currentCond = currentPeriod.shortForecast;
+      
       currentWindSpeed = currentPeriod.windSpeed;
       currentWindDirection = currentPeriod.windDirection;
       currentPrecipitationChance = formatPrecipitation(precipitation);
       
       currentHumidity = formatPrecipitation(humidity);
+
+      minorWeatherDisplays = [
+        MinorWeatherDisplay(displayText: "$currentWindSpeed $currentWindDirection",),
+        MinorWeatherDisplay(displayText: "$currentPrecipitationChance",),
+        MinorWeatherDisplay(displayText: "$currentHumidity",),
+      ];
     }
     
     return Scaffold(
+      backgroundColor: const Color(0xFF699EEE),
       body: Center(
         child: FutureBuilder(
           future: getCurrentWeather(),
           builder: (context, snapshot) {
 
-            if(snapshot.hasError){
+            if(snapshot.hasError || minorWeatherDisplays == null){
               return const CircularProgressIndicator();
             }
 
@@ -105,32 +117,26 @@ class CurrentWeatherDisplay extends StatelessWidget {
                 ),
 
                 // MINOR WEATHER DISPLAY
-                MinorWeatherDisplay(displayText: "$currentWindSpeed $currentWindDirection",),
-                MinorWeatherDisplay(displayText: "$currentPrecipitationChance",),
-                MinorWeatherDisplay(displayText: "$currentHumidity",),
+                Flexible(
+                  child: LayoutBuilder(
+                    builder: (BuildContext context, BoxConstraints constraints) {
+                      const crossAxisCount = 2;
+
+                      return GridView.builder(
+                        itemCount: minorWeatherDisplays!.length,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: 1, crossAxisCount: crossAxisCount),
+                        itemBuilder: (BuildContext context, int index) {
+                          return minorWeatherDisplays![index];
+                        }
+                      );
+                    }
+                  )
+                ),
               ],
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class MinorWeatherDisplay extends StatelessWidget {
-
-  final String? displayText;
-
-  const MinorWeatherDisplay({
-    this.displayText,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      displayText!,
-      style: const TextStyle(
-        fontSize: 32,
       ),
     );
   }

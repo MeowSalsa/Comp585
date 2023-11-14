@@ -9,6 +9,8 @@ import 'api_manager.dart';
 import 'location_weather_data.dart';
 import 'tests.dart';
 
+import 'daily_weather.dart';
+
 void main() {
   apiSystemTest();
   runApp(const MainApp());
@@ -19,10 +21,16 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
+    final textTheme = Theme.of(context).textTheme.apply(
+      bodyColor: Colors.white,
+      displayColor: Colors.white,
+    );
+    
+    return MaterialApp(
+      theme: ThemeData(textTheme: textTheme),
+      home: const Scaffold(
         body: Center(
-          child: Text('Hello World!'),
+          child: CurrentWeatherDisplay(locationString: "91344",)
         ),
       ),
     );
