@@ -21,9 +21,13 @@ import 'package:weather_app/data_manager.dart';
 import 'api_manager.dart';
 import 'location_weather_data.dart';
 
-
-void main() {
+void main() async {
+  DataManager test1 = DataManager();
+  //apiSystemTest();
   runApp(const RootApp());
+  await test1.saveFavoritesData();
+  var data = await test1.readFavoritesData();
+  print("Contents in Favorites_Data $data");
 }
 
 class RootApp extends StatelessWidget {

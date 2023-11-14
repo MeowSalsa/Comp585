@@ -1,7 +1,9 @@
 import 'dart:collection';
+import 'dart:io';
 
 import 'location_weather_data.dart';
 import 'api_manager.dart';
+import 'package:path_provider/path_provider.dart';
 
 enum ForecastType { now, hourly, daily, weekly }
 
@@ -9,7 +11,8 @@ class DataManager {
   final HashMap<String, LocationWeatherData> _recentSearches = HashMap();
   final HashMap<String, LocationWeatherData> _favoriteLocations = HashMap();
 
-  dynamic getForecast(LocationWeatherData locationData, Enum forecastType) async {
+  dynamic getForecast(
+      LocationWeatherData locationData, Enum forecastType) async {
     String locationString = locationData.searchInput!;
     switch (forecastType) {
       case ForecastType.now:
@@ -20,7 +23,7 @@ class DataManager {
         return hourlyForecast;
       case ForecastType.daily:
         var dailyForecast = _getDayForecast(locationString);
-      return dailyForecast;
+        return dailyForecast;
       case ForecastType.weekly:
         var forecast = _getWeeklyForecast(locationString);
         return forecast;
@@ -36,9 +39,9 @@ class DataManager {
     return nowForecast!;
   }
 
-   Future<List<Periods>> _getDayForecast(String locationString) async {
-List<Periods> dailyForecast = List.empty(growable: true);
-     var weeklyForecast = await _getWeeklyForecast(locationString);
+  Future<List<Periods>> _getDayForecast(String locationString) async {
+    List<Periods> dailyForecast = List.empty(growable: true);
+    var weeklyForecast = await _getWeeklyForecast(locationString);
     //var nowForecast = weeklyForecast.properties?.periods?[0];
     dailyForecast.add(weeklyForecast.properties!.periods![0]);
     dailyForecast.add(weeklyForecast.properties!.periods![1]);
@@ -114,5 +117,35 @@ List<Periods> dailyForecast = List.empty(growable: true);
     await newLocation.initializeLocation();
     _recentSearches[stringInput] = newLocation;
     return newLocation;
+  }
+
+  Future<String> get _localPath async {
+    var dir = await getApplicationDocumentsDirectory();
+    return dir.path;
+  }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/Favorites_data');
+  }
+
+  Future<File> saveFavoritesData() async {
+    //Map should go in ()
+    final file = await _localFile;
+    return file.writeAsString("Test");
+  }
+
+  Future<String> readFavoritesData() async {
+    try {
+      final file = await _localFile;
+
+      // Read the file
+      final contents = await file.readAsString();
+
+      return contents;
+    } catch (e) {
+      // If encountering an error, return 0
+      return "Error reading file";
+    }
   }
 }
