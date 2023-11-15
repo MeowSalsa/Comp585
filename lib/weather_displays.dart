@@ -13,12 +13,15 @@ class MinorWeatherDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    
     return Padding(
-      padding: const EdgeInsets.all(30.0),
+      padding: EdgeInsets.all(screenWidth / 24.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(40),
         child: Container(
-          padding: const EdgeInsets.all(15.0),
+          padding: EdgeInsets.all(screenWidth / 24.0),
           color: const Color(0x80E7E7E7),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -30,8 +33,8 @@ class MinorWeatherDisplay extends StatelessWidget {
                 Text(
                   "$titleText",
                   textAlign: TextAlign.left,
-                  style: const TextStyle(
-                    fontSize: 32,
+                  style: TextStyle(
+                    fontSize: screenWidth / 22.5,
                   ),
                 ),
               ),
@@ -42,7 +45,10 @@ class MinorWeatherDisplay extends StatelessWidget {
                   children: [
                     Center(
                       child: Text(
-                        "$displayText"
+                        "$displayText",
+                        style: TextStyle(
+                          fontSize: screenWidth / 22.5,
+                        ),
                       ),
                     ),
                   ]
