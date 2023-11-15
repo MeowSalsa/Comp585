@@ -28,7 +28,7 @@ class MainApp extends StatelessWidget {
     
     return MaterialApp(
       theme: ThemeData(textTheme: textTheme),
-      home: const Scaffold(
+      home: Scaffold(
         body: Center(
           child: CurrentWeatherDisplay(locationString: "91344",)
         ),
