@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:io';
 
 import 'location_weather_data.dart';
@@ -129,10 +130,11 @@ class DataManager {
     return File('$path/Favorites_data');
   }
 
-  Future<File> saveFavoritesData() async {
+  Future<File> saveFavoritesData(String jsonString) async {
     //Map should go in ()
     final file = await _localFile;
-    return file.writeAsString("Test");
+    print("Writing to disk");
+    return file.writeAsString(jsonString);
   }
 
   Future<String> readFavoritesData() async {
@@ -147,5 +149,16 @@ class DataManager {
       // If encountering an error, return 0
       return "Error reading file";
     }
+  }
+
+  void addToFavorites(LocationWeatherData dataObj) async {
+    _favoriteLocations[dataObj.searchInput!] = dataObj;
+    //serialize it
+    String data = "";
+    _favoriteLocations.forEach((key, value) {
+      data += json.encode(value);
+    });
+    await saveFavoritesData(data);
+    //save it to disk as string
   }
 }

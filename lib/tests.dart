@@ -77,6 +77,7 @@ testWeatherPoint() async {
 void apiSystemTest() async {
   DataManager newDM = DataManager();
   LocationWeatherData newLocation = await newDM.searchForLocation("91331");
+  newDM.addToFavorites(newLocation);
   print("NewLocation displable String ${newLocation.displayableString}");
   var temp = await newDM.getForecast(newLocation, ForecastType.daily);
   print(

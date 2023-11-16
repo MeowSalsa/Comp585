@@ -15,6 +15,16 @@ class LocationWeatherData {
   DateTime? hourlyForecastTimeStamp;
   DateTime? forecastTimeStamp;
 
+  Map<String, dynamic> toJson() => {
+        'weatherPointData': weatherPointData,
+        'searchInput': searchInput,
+        'displayableString': displayableString,
+      };
+  LocationWeatherData.fromJson(Map<String, dynamic> json)
+      : weatherPointData = json['weatherPointData'] as WeatherPoint,
+        searchInput = json['searchInput'] as String?,
+        displayableString = json['displayableString'] as String?;
+
   LocationWeatherData(String location) {
     searchInput = location;
   }

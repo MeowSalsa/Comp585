@@ -25,7 +25,8 @@ void main() async {
   DataManager test1 = DataManager();
   //apiSystemTest();
   runApp(const RootApp());
-  await test1.saveFavoritesData();
+  LocationWeatherData newLocation = await test1.searchForLocation("91331");
+  test1.addToFavorites(newLocation);
   var data = await test1.readFavoritesData();
   print("Contents in Favorites_Data $data");
 }
