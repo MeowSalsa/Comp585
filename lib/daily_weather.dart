@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'api_manager.dart';
 import 'data_manager.dart';
+import 'colors.dart';
 import 'location_weather_data.dart';
 import 'weather_displays.dart';
 class CurrentWeatherDisplay extends StatelessWidget {
@@ -28,79 +29,95 @@ class CurrentWeatherDisplay extends StatelessWidget {
           return const CircularProgressIndicator();
         }
 
+        final TimeBasedColorScheme colorScheme = TimeBasedColorScheme.colorSchemeFromLocalTime(weatherData.locationLongitude);
+
         return Scaffold(
-          backgroundColor: const Color(0xFF699EEE),
+          
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  colorScheme.skyStartColor!,
+                  colorScheme.skyEndColor!,
+                ],
+                begin: Alignment.topCenter,
+                end: const Alignment(0.5, 0.75),
+                stops: const [0.0, 1.0],
+                tileMode: TileMode.clamp
+              ),
+            ),
+            child: Center(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
 
-          body: Center(
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: screenWidth / 24.0, top: screenWidth / 24.0),
+                  // Location label
+                  Padding(
+                    padding: EdgeInsets.only(left: screenWidth / 24.0, top: screenWidth / 24.0),
 
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
 
-                      Flexible(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          clipBehavior: Clip.hardEdge,
-                          child: Text(
-                            "${weatherData.currentCity}, ${weatherData.currentState}",
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontSize: screenWidth / 20.0,
-                              fontWeight: FontWeight.bold,
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            clipBehavior: Clip.hardEdge,
+                            child: Text(
+                              "${weatherData.currentCity}, ${weatherData.currentState}",
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: screenWidth / 20.0,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(padding: EdgeInsets.only(top: screenWidth / 13.1)),
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(padding: EdgeInsets.only(top: screenWidth / 13.1)),
 
-                      // MAJOR WEATHER DISPLAY
-                      // Condition icon
-                      MajorWeatherDisplay(
-                        temperatureLabel: "${weatherData.currentTemp}\u00B0${weatherData.currentUnits}", 
-                        conditionLabel: "${weatherData.currentCond}",
-                      ),
-
-                      Padding(padding: EdgeInsets.only(top: screenWidth * (3.0 / 8.0))),
-
-                      // MINOR WEATHER DISPLAYS
-                      Card(
-                        color: const Color(0xFF97D3BD),
-                        margin: EdgeInsets.zero,
-                        child: Column(
-                          children: [
-                            GridView(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: 1, crossAxisCount: 2),
-
-                              children: [
-                                WindDisplay(windSpeed: weatherData.currentWindSpeed, windDirection: weatherData.currentWindDirection,),
-                                PrecipitationDisplay(precipitationChance: weatherData.currentPrecipitationChance,),
-                                HumidityDisplay(humidityPercent: weatherData.currentHumidity,),
-                              ],
-                            ),
-
-                            // Placeholder for buttons
-                            const Text("hello",),
-                          ],
+                        // MAJOR WEATHER DISPLAY
+                        MajorWeatherDisplay(
+                          temperatureLabel: "${weatherData.currentTemp}\u00B0${weatherData.currentUnits}", 
+                          conditionLabel: "${weatherData.currentCond}",
                         ),
-                      ),
-                    ],
+
+                        Padding(padding: EdgeInsets.only(top: screenWidth * (3.0 / 8.0))),
+
+                        // MINOR WEATHER DISPLAYS
+                        Card(
+                          color: colorScheme.mainBGColor,
+                          margin: EdgeInsets.zero,
+                          child: Column(
+                            children: [
+                              GridView(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: 1, crossAxisCount: 2),
+
+                                children: [
+                                  WindDisplay(windSpeed: weatherData.currentWindSpeed, windDirection: weatherData.currentWindDirection,),
+                                  PrecipitationDisplay(precipitationChance: weatherData.currentPrecipitationChance,),
+                                  HumidityDisplay(humidityPercent: weatherData.currentHumidity,),
+                                ],
+                              ),
+
+                              // Placeholder for buttons
+                              const Text("hello",),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -126,6 +143,8 @@ class WeatherData {
   String? currentWindDirection = "";
   String? currentPrecipitationChance;
   String? currentHumidity;
+  String? time;
+  double? locationLongitude;
 
   bool isFirstTimeLoad = true;
 
@@ -156,6 +175,8 @@ class WeatherData {
     currentPrecipitationChance = formatPrecipitation(precipitation);
     
     currentHumidity = formatPrecipitation(humidity);
+
+    locationLongitude = weatherLocation.long!;
 
     isFirstTimeLoad = false;
   }

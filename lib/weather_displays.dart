@@ -11,26 +11,32 @@ class MajorWeatherDisplay extends StatelessWidget {
     required this.conditionLabel,
   });
 
-  Icon getConditionIcon(String condition, double screenWidth) {
+  Icon getConditionIcon(String condition, double iconSize) {
 
     switch(condition) {
       case String s when s.contains("Cloudy"):
         return Icon(
-          Icons.cloud,
+          Icons.cloud_outlined,
           color: Colors.white,
-          size: screenWidth / 2.0,
+          size: iconSize,
         );
-      case String s when (s.contains("Rain") || s.contains("Showers") || s.contains("Snow")):
+      case String s when (s.contains("Rain") || s.contains("Showers")):
         return Icon(
           Icons.cloudy_snowing,
           color: Colors.white,
-          size: screenWidth / 2.0,
+          size: iconSize,
+        );
+      case String s when s.contains("Snow"):
+        return Icon(
+          Icons.ac_unit,
+          color: Colors.white,
+          size: iconSize,
         );
       default:
         return Icon(
-          Icons.sunny,
+          Icons.wb_sunny_outlined,
           color: const Color(0xFFFFF386),
-          size: screenWidth / 2.0,
+          size: iconSize,
         );
     }
   }
@@ -41,9 +47,10 @@ class MajorWeatherDisplay extends StatelessWidget {
 
     return Column(
       children: [
+        // Condition icon
         Container(
           padding: EdgeInsets.all(screenWidth / 36.0),
-          child: getConditionIcon(conditionLabel, screenWidth)
+          child: getConditionIcon(conditionLabel, screenWidth / 2.0)
         ),
 
         // Temperature
