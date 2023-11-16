@@ -67,30 +67,9 @@ class CurrentWeatherDisplay extends StatelessWidget {
 
                       // MAJOR WEATHER DISPLAY
                       // Condition icon
-                      Container(
-                        padding: EdgeInsets.all(screenWidth / 36.0),
-                        child: Icon(
-                          Icons.sunny,
-                          color: const Color(0xFFFFF386),
-                            size: screenWidth / 2.0,
-                        ),
-                      ),
-
-                      // Temperature
-                      Text(
-                        "${weatherData.currentTemp}\u00B0${weatherData.currentUnits}",
-                        style: TextStyle(
-                          fontSize: screenWidth / 7.5,
-                        ),
-                      ),
-
-                      //Condition label
-                      Text(
-                        "${weatherData.currentCond}",
-                        style: TextStyle(
-                          fontSize: screenWidth / 22.5,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      MajorWeatherDisplay(
+                        temperatureLabel: "${weatherData.currentTemp}\u00B0${weatherData.currentUnits}", 
+                        conditionLabel: "${weatherData.currentCond}",
                       ),
 
                       Padding(padding: EdgeInsets.only(top: screenWidth * (3.0 / 8.0))),
