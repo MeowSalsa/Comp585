@@ -1,19 +1,85 @@
 import 'package:flutter/material.dart';
 
+class MajorWeatherDisplay extends StatelessWidget {
+
+  final String temperatureLabel;
+  final String conditionLabel;
+
+  const MajorWeatherDisplay({
+    super.key,
+    required this.temperatureLabel,
+    required this.conditionLabel,
+  });
+
+  Icon getConditionIcon(String condition, double screenWidth) {
+
+    switch(condition) {
+      case String s when s.contains("Cloudy"):
+        return Icon(
+          Icons.cloud,
+          color: Colors.white,
+          size: screenWidth / 2.0,
+        );
+      case String s when (s.contains("Rain") || s.contains("Showers") || s.contains("Snow")):
+        return Icon(
+          Icons.cloudy_snowing,
+          color: Colors.white,
+          size: screenWidth / 2.0,
+        );
+      default:
+        return Icon(
+          Icons.sunny,
+          color: const Color(0xFFFFF386),
+          size: screenWidth / 2.0,
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.all(screenWidth / 36.0),
+          child: getConditionIcon(conditionLabel, screenWidth)
+        ),
+
+        // Temperature
+        Text(
+          temperatureLabel,
+          style: TextStyle(
+            fontSize: screenWidth / 7.5,
+          ),
+        ),
+
+        //Condition label
+        Text(
+          conditionLabel,
+          style: TextStyle(
+            fontSize: screenWidth / 22.5,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class MinorWeatherDisplay extends StatelessWidget {
 
   final String? titleText;
-  final String? displayText;
+  final Widget displayWidget;
 
   const MinorWeatherDisplay({
     super.key,
     this.titleText,
-    this.displayText,
+    required this.displayWidget,
   });
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     
     return Padding(
@@ -44,12 +110,7 @@ class MinorWeatherDisplay extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Center(
-                      child: Text(
-                        "$displayText",
-                        style: TextStyle(
-                          fontSize: screenWidth / 22.5,
-                        ),
-                      ),
+                      child: displayWidget,
                     ),
                   ]
                 ),
@@ -75,7 +136,17 @@ class WindDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MinorWeatherDisplay(titleText: "WIND", displayText: "$windSpeed $windDirection",);
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    return MinorWeatherDisplay(
+      titleText: "WIND", 
+      displayWidget: Text(
+        "$windSpeed $windDirection",
+        style: TextStyle(
+          fontSize: screenWidth / 22.5,
+        ),
+      ),
+    );
   }
 }
 
@@ -90,7 +161,28 @@ class PrecipitationDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MinorWeatherDisplay(titleText: "PRECIPITATION", displayText: "$precipitationChance",);
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    return MinorWeatherDisplay(
+      titleText: "PRECIPITATION", 
+      displayWidget: Column(
+        children: [
+          Padding(padding: EdgeInsets.only(top: screenWidth / 48.0)),
+          Icon(
+            Icons.snowing,
+            color: Colors.white,
+            size: screenWidth * (3.0 / 20.0),
+          ),
+          Padding(padding: EdgeInsets.only(top: screenWidth / 24.0)),
+          Text(
+            "$precipitationChance",
+            style: TextStyle(
+              fontSize: screenWidth / 22.5,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -105,6 +197,27 @@ class HumidityDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MinorWeatherDisplay(titleText: "HUMIDITY", displayText: "$humidityPercent",);
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    return MinorWeatherDisplay(
+      titleText: "HUMIDITY", 
+      displayWidget: Column(
+        children: [
+          Padding(padding: EdgeInsets.only(top: screenWidth / 48.0)),
+          Icon(
+            Icons.wind_power,
+            color: Colors.white,
+            size: screenWidth * (3.0 / 20.0),
+          ),
+          Padding(padding: EdgeInsets.only(top: screenWidth / 24.0)),
+          Text(
+            "$humidityPercent",
+            style: TextStyle(
+              fontSize: screenWidth / 22.5,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
