@@ -156,90 +156,152 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class CurvedSquareIcon extends StatelessWidget {
-  const CurvedSquareIcon({super.key});
+class CurvedSquareIcon extends StatefulWidget {
+  const CurvedSquareIcon({Key? key}) : super(key: key);
+
+  @override
+  _CurvedSquareIconState createState() => _CurvedSquareIconState();
+}
+
+class _CurvedSquareIconState extends State<CurvedSquareIcon> {
+  late Future<List<HourlyPeriods>> weatherForecasts;
+
+  @override
+  void initState() {
+    super.initState();
+    weatherForecasts = fetchWeatherForecasts();
+  }
+
+  Future<List<HourlyPeriods>> fetchWeatherForecasts() async {
+    List<LocationWeatherData> cities = List.empty(growable: true);
+
+    DataManager dataManager = DataManager();
+    cities.add(await dataManager.searchForLocation("Los Angeles, California"));
+    List<HourlyPeriods> forecasts = [];
+
+    for (var city in cities) {
+      try {
+        HourlyPeriods forecast =
+            await dataManager.getForecast(city, ForecastType.now);
+        forecasts.add(forecast);
+      } catch (e) {
+        print('Error fetching forecast for $city: $e');
+        // Handle the error or add a placeholder
+      }
+    }
+    return forecasts;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      primary: false,
-      childAspectRatio: 1.0,
-      // Adjust this value to change the width-to-height ratio of the boxes
-      padding: const EdgeInsets.only(top: 20, bottom: 20),
-      crossAxisSpacing: 10,
-      mainAxisSpacing: 10,
-      crossAxisCount: 2,
-      children: <Widget>[
-        _buildWeatherBox(context, 'Los Angeles, CA', '76°', 'Sunny',
-            FontAwesomeIcons.sun, Colors.yellow),
-        _buildWeatherBox(context, 'New York, NY', '63°', 'Mostly Sunny',
-            Icons.wb_sunny, Colors.yellow),
-        _buildWeatherBox(context, 'Las Vegas, NV', '90°', 'Sunny',
-            FontAwesomeIcons.sunPlantWilt, Colors.yellow),
-        _buildWeatherBox(context, 'Boston, MA', '63°', 'Isolated Rain Showers',
-            FontAwesomeIcons.cloudRain, Colors.blue),
-        _buildWeatherBox(
-            context,
-            'Miami, FL',
-            '87°',
-            'Chance Showers And Thunderstorms',
-            // ignore: deprecated_member_use
-            FontAwesomeIcons.thunderstorm,
-            Colors.red),
-        _buildWeatherBox(context, 'Austin, TX', '81°',
-            'Slight Chance Rain Showers', Icons.cloud, Colors.grey),
-      ],
+    return FutureBuilder<List<HourlyPeriods>>(
+      future: weatherForecasts,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return const Text("Error fetching weather data");
+        } else if (snapshot.hasData) {
+          return GridView.count(
+            crossAxisCount: 2,
+            children: snapshot.data!
+                .map((forecast) => _buildWeatherBox(
+                      context,
+                      forecast.name ?? 'Unknown Location',
+                      '${forecast.temperature ?? 'N/A'}°',
+                      forecast.shortForecast ?? 'Unavailable',
+                      getIconForCondition(forecast.shortForecast),
+                      getColorForTemperature(forecast.temperature),
+                    ))
+                .toList(),
+          );
+        } else {
+          return const Text('No weather data available');
+        }
+      },
     );
   }
 
-  Widget _buildWeatherBox(BuildContext context, String city, String temperature,
-      String weather, IconData icon, Color iconColor) {
-    return Builder(builder: (BuildContext innerContext) {
-      return Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-              innerContext,
-              MaterialPageRoute(
-                builder: (context) => DetailScreen(city: city),
-              ),
-            );
-          },
-          child: Container(
-            width: 150.0,
-            height: 150.0,
-            decoration: BoxDecoration(
-              // color: Colors.transparent,
-              // borderRadius: BorderRadius.circular(15.0),
-              // border:
-              //     Border.all(color: Colors.white.withOpacity(0.5), width: 1.0),
-              color: Colors.grey.withOpacity(0.3), // 0.5 means 50% opacity
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min, // Adjust the main axis size
-                children: [
-                  Text(city,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 14)),
-                  const SizedBox(height: 5),
-                  Icon(icon, size: 40, color: iconColor),
-                  const SizedBox(height: 5),
-                  Text(temperature,
-                      style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 5),
-                  Text(weather, style: const TextStyle(fontSize: 12)),
-                ],
-              ),
-            ),
+  IconData getIconForCondition(String? iconCode) {
+    // Implement your own logic to map iconCode to IconData
+    // This is just a placeholder
+    return FontAwesomeIcons.sun;
+  }
+
+  Color getColorForTemperature(int? temperature) {
+    // Implement your own logic to return a color based on the temperature
+    // This is just a placeholder
+    return Colors.yellow;
+  }
+}
+//---------------------------------------------------
+//uncomment this to go back how i had it - A.C.
+//--------------------------------------------------
+//     children: <Widget>[
+//       _buildWeatherBox(context, 'Los Angeles, CA', '76°', 'Sunny',
+//           FontAwesomeIcons.sun, Colors.yellow),
+//       _buildWeatherBox(context, 'New York, NY', '63°', 'Mostly Sunny',a
+//           Icons.wb_sunny, Colors.yellow),
+//       _buildWeatherBox(context, 'Las Vegas, NV', '90°', 'Sunny',
+//           FontAwesomeIcons.sunPlantWilt, Colors.yellow),
+//       _buildWeatherBox(context, 'Boston, MA', '63°', 'Isolated Rain Showers',
+//           FontAwesomeIcons.cloudRain, Colors.blue),
+//       _buildWeatherBox(
+//           context,
+//           'Miami, FL',
+//           '87°',
+//           'Chance Showers And Thunderstorms',
+//           / ignore: deprecated_member_use
+//           FontAwesomeIcons.thunderstorm,
+//           Colors.red),
+//       _buildWeatherBox(context, 'Austin, TX', '81°',
+//           'Slight Chance Rain Showers', Icons.cloud, Colors.grey),
+//     ],
+//   );
+// }
+
+Widget _buildWeatherBox(BuildContext context, String city, String temperature,
+    String weather, IconData icon, Color iconColor) {
+  // This widget builds each individual weather box with the city, temperature, and weather condition.
+  return Material(
+    color: Colors.transparent,
+    child: InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailScreen(city: city),
+          ),
+        );
+      },
+      child: Container(
+        width: 150.0,
+        height: 150.0,
+        decoration: BoxDecoration(
+          color: Colors.grey.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(city,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 14)),
+              const SizedBox(height: 5),
+              Icon(icon, size: 40, color: iconColor),
+              const SizedBox(height: 5),
+              Text(temperature,
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 5),
+              Text(weather, style: const TextStyle(fontSize: 12)),
+            ],
           ),
         ),
-      );
-    });
-  }
+      ),
+    ),
+  );
 }
