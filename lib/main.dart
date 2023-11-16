@@ -25,10 +25,11 @@ void main() async {
   DataManager test1 = DataManager();
   //apiSystemTest();
   runApp(const RootApp());
-  LocationWeatherData newLocation = await test1.searchForLocation("91331");
+  /*  LocationWeatherData newLocation = await test1.searchForLocation("91331");
   test1.addToFavorites(newLocation);
-  var data = await test1.readFavoritesData();
-  print("Contents in Favorites_Data $data");
+  newLocation = await test1.searchForLocation("Los Angeles, California");
+  test1.addToFavorites(newLocation); */
+  await test1.loadFavorites();
 }
 
 class RootApp extends StatelessWidget {

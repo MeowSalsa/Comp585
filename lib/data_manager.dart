@@ -127,7 +127,7 @@ class DataManager {
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    return File('$path/Favorites_data');
+    return File('$path/Favorites_data.json');
   }
 
   Future<File> saveFavoritesData(String jsonString) async {
@@ -151,13 +151,21 @@ class DataManager {
     }
   }
 
+  Future<void> loadFavorites() async {
+    String fileContents = await readFavoritesData();
+    var favorites = json.decode(fileContents);
+    print(favorites.toString());
+  }
+
   void addToFavorites(LocationWeatherData dataObj) async {
     _favoriteLocations[dataObj.searchInput!] = dataObj;
     //serialize it
-    String data = "";
+    String data =
+        ""; /* 
     _favoriteLocations.forEach((key, value) {
       data += json.encode(value);
-    });
+    }); */
+    data = json.encode(_favoriteLocations);
     await saveFavoritesData(data);
     //save it to disk as string
   }
