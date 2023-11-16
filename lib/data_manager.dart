@@ -9,7 +9,8 @@ class DataManager {
   final HashMap<String, LocationWeatherData> _recentSearches = HashMap();
   final HashMap<String, LocationWeatherData> _favoriteLocations = HashMap();
 
-  dynamic getForecast(LocationWeatherData locationData, Enum forecastType) async {
+  dynamic getForecast(
+      LocationWeatherData locationData, Enum forecastType) async {
     String locationString = locationData.searchInput!;
     switch (forecastType) {
       case ForecastType.now:
@@ -19,14 +20,30 @@ class DataManager {
         var hourlyForecast = _getHourlyForecast(locationString);
         return hourlyForecast;
       case ForecastType.daily:
-        //handleDaily();
-        break;
+        var dailyForecast = _getDayForecast(locationString);
+        return dailyForecast;
       case ForecastType.weekly:
         var forecast = _getWeeklyForecast(locationString);
         return forecast;
       default:
         print("Something went wrong in ForecastType switch");
     }
+  }
+
+  Future<HourlyPeriods> _getNowForecast(String locationString) async {
+    HourlyForecast hourlyForecast = await _getHourlyForecast(locationString);
+    var nowForecast = hourlyForecast.properties?.periods?[0];
+    print(nowForecast);
+    return nowForecast!;
+  }
+
+  Future<List<Periods>> _getDayForecast(String locationString) async {
+    List<Periods> dailyForecast = List.empty(growable: true);
+    var weeklyForecast = await _getWeeklyForecast(locationString);
+    //var nowForecast = weeklyForecast.properties?.periods?[0];
+    dailyForecast.add(weeklyForecast.properties!.periods![0]);
+    dailyForecast.add(weeklyForecast.properties!.periods![1]);
+    return dailyForecast;
   }
 
   Future<Forecast> _getWeeklyForecast(String locationString) async {
