@@ -159,10 +159,12 @@ class DataManager {
   Future<void> loadFavorites() async {
     String fileContents = await _readFavoritesData();
     if (fileContents != "Error reading file") {
-      var favoritesData = json.decode(fileContents);
-      _favoriteLocations = HashMap.from((favoritesData as Map<String, dynamic>)
-          .map((key, value) =>
-              MapEntry(key, LocationWeatherData.fromJson(value))));
+      if (fileContents.isNotEmpty) {
+        var favoritesData = json.decode(fileContents);
+        _favoriteLocations = HashMap.from(
+            (favoritesData as Map<String, dynamic>).map((key, value) =>
+                MapEntry(key, LocationWeatherData.fromJson(value))));
+      }
     }
   }
 

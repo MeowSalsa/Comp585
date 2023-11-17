@@ -34,6 +34,7 @@ void main() async {
   dataManager.addToFavorites(newLocation); */
   await dataManager.loadFavorites(); // reads favorite file
   var favorites = dataManager.getFavorites();
+  print(favorites.length);
 }
 
 class RootApp extends StatelessWidget {
