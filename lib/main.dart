@@ -175,25 +175,47 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
   }
 
   Future<List<HourlyPeriods>> fetchWeatherForecasts() async {
-    List<LocationWeatherData> cities = List.empty(growable: true);
+    await dataManager.loadFavorites(); // Load favorites from file
+    List<LocationWeatherData> favorites = dataManager.getFavorites();
 
-    DataManager dataManager = DataManager();
-    cities.add(await dataManager.searchForLocation("Los Angeles, California"));
-    cities.add(await dataManager.searchForLocation("New York City, New York"));
     List<HourlyPeriods> forecasts = [];
-
-    for (var city in cities) {
+    for (var favorite in favorites) {
       try {
         HourlyPeriods forecast =
-            await dataManager.getForecast(city, ForecastType.now);
+            await dataManager.getForecast(favorite, ForecastType.now);
         forecasts.add(forecast);
       } catch (e) {
-        print('Error fetching forecast for $city: $e');
+        print('Error fetching forecast for ${favorite.searchInput}: $e');
         // Handle the error or add a placeholder
       }
     }
     return forecasts;
   }
+
+  // Future<List<HourlyPeriods>> fetchWeatherForecasts() async {
+  //   List<LocationWeatherData> cities = List.empty(growable: true);
+
+  //   DataManager dataManager = DataManager();
+  //   cities.add(await dataManager.searchForLocation("Los Angeles, California"));
+  //   cities.add(await dataManager.searchForLocation("New York City, New York"));
+  //   cities.add(await dataManager.searchForLocation("Las Vegas, Nevada"));
+  //   cities.add(await dataManager.searchForLocation("Boston, Massachusetts"));
+  //   cities.add(await dataManager.searchForLocation("Miami, Florida"));
+  //   cities.add(await dataManager.searchForLocation("Austin, Texas"));
+  //   List<HourlyPeriods> forecasts = [];
+
+  //   for (var city in cities) {
+  //     try {
+  //       HourlyPeriods forecast =
+  //           await dataManager.getForecast(city, ForecastType.now);
+  //       forecasts.add(forecast);
+  //     } catch (e) {
+  //       print('Error fetching forecast for $city: $e');
+  //       // Handle the error or add a placeholder
+  //     }
+  //   }
+  //   return forecasts;
+  // }
 
   @override
   Widget build(BuildContext context) {
