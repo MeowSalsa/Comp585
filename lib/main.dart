@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -21,15 +23,23 @@ import 'package:weather_app/data_manager.dart';
 import 'api_manager.dart';
 import 'location_weather_data.dart';
 
+DataManager test1 = DataManager();
 void main() async {
-  DataManager test1 = DataManager();
-  //apiSystemTest();
   runApp(const RootApp());
-  /*  LocationWeatherData newLocation = await test1.searchForLocation("91331");
+  /* LocationWeatherData newLocation = await test1.searchForLocation("91331");
   test1.addToFavorites(newLocation);
   newLocation = await test1.searchForLocation("Los Angeles, California");
   test1.addToFavorites(newLocation); */
   await test1.loadFavorites();
+  var favorites = test1.getFavorites();
+  processFavorites(favorites);
+}
+
+Future<void> processFavorites(List<LocationWeatherData> favorites) async {
+  await Future.forEach(favorites, (LocationWeatherData data) async {
+    var forecastData = await test1.getForecast(data, ForecastType.now);
+    print(forecastData.temperature);
+  });
 }
 
 class RootApp extends StatelessWidget {

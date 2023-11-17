@@ -16,18 +16,24 @@ class LocationWeatherData {
   DateTime? forecastTimeStamp;
 
   Map<String, dynamic> toJson() => {
-        'weatherPointData': weatherPointData,
+        'weatherPointData': weatherPointData?.toJson(),
         'searchInput': searchInput,
         'displayableString': displayableString,
       };
-  LocationWeatherData.fromJson(Map<String, dynamic> json)
-      : weatherPointData = json['weatherPointData'] as WeatherPoint,
-        searchInput = json['searchInput'] as String?,
-        displayableString = json['displayableString'] as String?;
-
-  LocationWeatherData(String location) {
+  factory LocationWeatherData.fromJson(Map<String, dynamic> json) {
+    return LocationWeatherData(
+      weatherPointData: WeatherPoint.fromJson(json['weatherPointData']),
+      searchInput: json['searchInput'],
+      displayableString: json['displayableString'],
+    );
+  }
+  LocationWeatherData.defaultConstructor(String location) {
     searchInput = location;
   }
+  LocationWeatherData(
+      {required this.weatherPointData,
+      required this.searchInput,
+      required this.displayableString});
 
   Future<Forecast> weatherPointToForecast() async {
     if (forecast == null ||

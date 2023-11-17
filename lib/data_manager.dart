@@ -10,7 +10,7 @@ enum ForecastType { now, hourly, daily, weekly }
 
 class DataManager {
   final HashMap<String, LocationWeatherData> _recentSearches = HashMap();
-  final HashMap<String, LocationWeatherData> _favoriteLocations = HashMap();
+  HashMap<String, LocationWeatherData> _favoriteLocations = HashMap();
 
   dynamic getForecast(
       LocationWeatherData locationData, Enum forecastType) async {
@@ -114,7 +114,8 @@ class DataManager {
       print("Already in map, returning previous entry");
       return _recentSearches[stringInput]!;
     }
-    LocationWeatherData newLocation = LocationWeatherData(stringInput);
+    LocationWeatherData newLocation =
+        LocationWeatherData.defaultConstructor(stringInput);
     await newLocation.initializeLocation();
     _recentSearches[stringInput] = newLocation;
     return newLocation;
@@ -127,6 +128,7 @@ class DataManager {
 
   Future<File> get _localFile async {
     final path = await _localPath;
+    print("Path: ${path.toString()}");
     return File('$path/Favorites_data.json');
   }
 
@@ -153,8 +155,13 @@ class DataManager {
 
   Future<void> loadFavorites() async {
     String fileContents = await readFavoritesData();
-    var favorites = json.decode(fileContents);
-    print(favorites.toString());
+    if (fileContents != "Error reading file") {
+      var favoritesData = json.decode(fileContents);
+
+      _favoriteLocations = HashMap.from((favoritesData as Map<String, dynamic>)
+          .map((key, value) =>
+              MapEntry(key, LocationWeatherData.fromJson(value))));
+    }
   }
 
   void addToFavorites(LocationWeatherData dataObj) async {
@@ -168,5 +175,13 @@ class DataManager {
     data = json.encode(_favoriteLocations);
     await saveFavoritesData(data);
     //save it to disk as string
+  }
+
+  List<LocationWeatherData> getFavorites() {
+    List<LocationWeatherData> favoritesList = List.empty(growable: true);
+    _favoriteLocations.forEach((key, value) {
+      favoritesList.add(value);
+    });
+    return favoritesList;
   }
 }
