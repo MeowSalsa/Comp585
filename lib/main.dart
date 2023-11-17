@@ -20,7 +20,7 @@ import 'package:weather_app/tests.dart';
 import 'package:weather_app/data_manager.dart';
 import 'api_manager.dart';
 import 'location_weather_data.dart';
-import 'tests.dart';
+// import 'tests.dart';
 
 void main() {
   runApp(const RootApp());
