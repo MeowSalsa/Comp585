@@ -25,14 +25,14 @@ class WeatherPoint {
         : null;
   }
 
-/*   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     if (properties != null) {
       data['properties'] = properties!.toJson();
     }
     return data;
-  } */
+  }
 }
 
 class Properties {
@@ -55,13 +55,14 @@ class Properties {
         : null;
   }
 //Might need this section for saving user's favorited locations.
-  /*  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['@id'] = this.id;
-    data['gridId'] = this.gridId;
-    data['gridX'] = this.gridX;
-    data['gridY'] = this.gridY;
-  } */
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['@id'] = id;
+    data['gridId'] = gridId;
+    data['gridX'] = gridX;
+    data['gridY'] = gridY;
+    return data;
+  }
 }
 
 class RelativeLocation {
@@ -381,9 +382,9 @@ class AddressComponents {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['long_name'] = this.longName;
-    data['short_name'] = this.shortName;
-    data['types'] = this.types;
+    data['long_name'] = longName;
+    data['short_name'] = shortName;
+    data['types'] = types;
     return data;
   }
 }
@@ -457,7 +458,8 @@ class APIManager {
     }
   }
 
-  Future<HourlyForecast> getHourlyForecast(WeatherPoint currentWeatherPoint) async {
+  Future<HourlyForecast> getHourlyForecast(
+      WeatherPoint currentWeatherPoint) async {
     String? gridX = currentWeatherPoint.properties?.gridX.toString();
     String? gridY = currentWeatherPoint.properties?.gridY.toString();
     print(
@@ -476,7 +478,8 @@ class APIManager {
     }
   }
 
-  Future<CoordinatesFromLocation?> getCoordinatesFromLocation(String location) async {
+  Future<CoordinatesFromLocation?> getCoordinatesFromLocation(
+      String location) async {
     final response = await http.get(Uri.parse(
         "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=AIzaSyDeKwo1CHHgV09Jfh-MVGxHzpvKWDXr-vQ"));
     if (response.statusCode == 200) {

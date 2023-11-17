@@ -1,21 +1,26 @@
+// ignore_for_file: avoid_print
+
 import 'dart:collection';
+import 'dart:convert';
+import 'dart:io';
 
 import 'location_weather_data.dart';
 import 'api_manager.dart';
+import 'package:path_provider/path_provider.dart';
 
 enum ForecastType { now, hourly, daily, weekly }
 
 class DataManager {
   final HashMap<String, LocationWeatherData> _recentSearches = HashMap();
-  final HashMap<String, LocationWeatherData> _favoriteLocations = HashMap();
+  HashMap<String, LocationWeatherData> _favoriteLocations = HashMap();
 
   dynamic getForecast(
       LocationWeatherData locationData, Enum forecastType) async {
     String locationString = locationData.searchInput!;
     switch (forecastType) {
       case ForecastType.now:
-        //handlenow();
-        break;
+        var nowForecast = _getNowForecast(locationString);
+        return nowForecast;
       case ForecastType.hourly:
         var hourlyForecast = _getHourlyForecast(locationString);
         return hourlyForecast;
@@ -111,9 +116,73 @@ class DataManager {
       print("Already in map, returning previous entry");
       return _recentSearches[stringInput]!;
     }
-    LocationWeatherData newLocation = LocationWeatherData(stringInput);
+    LocationWeatherData newLocation =
+        LocationWeatherData.defaultConstructor(stringInput);
     await newLocation.initializeLocation();
     _recentSearches[stringInput] = newLocation;
     return newLocation;
+  }
+
+  Future<String> get _localPath async {
+    var dir = await getApplicationDocumentsDirectory();
+    return dir.path;
+  }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    print("Path: ${path.toString()}");
+    return File('$path/Favorites_data.json');
+  }
+
+  Future<File> _saveFavoritesData(String jsonString) async {
+    final file = await _localFile;
+    print("Writing to disk");
+    return file.writeAsString(jsonString);
+  }
+
+  Future<String> _readFavoritesData() async {
+    try {
+      final file = await _localFile;
+
+      // Read the file
+      final contents = await file.readAsString();
+
+      return contents;
+    } catch (e) {
+      // If encountering an error, return 0
+      return "Error reading file";
+    }
+  }
+
+  /// Asynchronous function that reads the user's favorites locations and
+  /// populates a _FavoriteLocations hashmap with the data.
+  Future<void> loadFavorites() async {
+    String fileContents = await _readFavoritesData();
+    if (fileContents != "Error reading file") {
+      if (fileContents.isNotEmpty) {
+        var favoritesData = json.decode(fileContents);
+        _favoriteLocations = HashMap.from(
+            (favoritesData as Map<String, dynamic>).map((key, value) =>
+                MapEntry(key, LocationWeatherData.fromJson(value))));
+      }
+    }
+  }
+
+  /// Adds a LocationWeatherData object to the _FavoriteLocations hashmap, and asynchronously
+  /// writes the new location to the favorite locations JSON file.
+  void addToFavorites(LocationWeatherData dataObj) async {
+    _favoriteLocations[dataObj.searchInput!] = dataObj;
+    String data = "";
+    data = json.encode(_favoriteLocations);
+    await _saveFavoritesData(data);
+  }
+
+  /// Turns the _favoriteLocations hashmap into a list<LocationWeatherData> then returns it.
+  List<LocationWeatherData> getFavorites() {
+    List<LocationWeatherData> favoritesList = List.empty(growable: true);
+    _favoriteLocations.forEach((key, value) {
+      favoritesList.add(value);
+    });
+    return favoritesList;
   }
 }
