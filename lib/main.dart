@@ -23,23 +23,25 @@ import 'package:weather_app/tests.dart';
 import 'package:weather_app/data_manager.dart';
 import 'api_manager.dart';
 import 'location_weather_data.dart';
+import 'tests.dart';
 
 void main() {
   runApp(const RootApp());
+}
 
-DataManager dataManager = DataManager();
-void main() async {
-  runApp(const RootApp());
-  //RUN THE BELOW COMMENTED SECTION ONCE TO CREATE AND POPULATE THE FAVORITES
-  //FILE AND FAVORITES HASHMAP. COMMENT IT OUT AFTER TO WORK ON ONLY THE FAVORITED DATA
-  /* LocationWeatherData newLocation = await dataManager.searchForLocation("91331");
+//   DataManager dataManager = DataManager();
+// void main() async {
+//   runApp(const RootApp());
+//RUN THE BELOW COMMENTED SECTION ONCE TO CREATE AND POPULATE THE FAVORITES
+//FILE AND FAVORITES HASHMAP. COMMENT IT OUT AFTER TO WORK ON ONLY THE FAVORITED DATA
+/* LocationWeatherData newLocation = await dataManager.searchForLocation("91331");
   dataManager.addToFavorites(newLocation);
   newLocation = await dataManager.searchForLocation("Los Angeles, California");
   dataManager.addToFavorites(newLocation); */
-  await dataManager.loadFavorites(); // reads favorite file
-  var favorites = dataManager.getFavorites();
+//   await dataManager.loadFavorites(); // reads favorite file
+//   var favorites = dataManager.getFavorites();
 
-}
+// }
 
 class RootApp extends StatelessWidget {
   const RootApp({super.key});
@@ -64,7 +66,6 @@ class DetailScreen extends StatefulWidget {
 
   @override
   _DetailScreenState createState() => _DetailScreenState();
-
 }
 
 class _DetailScreenState extends State<DetailScreen> {
@@ -105,7 +106,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     String formattedDate = DateFormat('EEEE, MMMM d, y').format(DateTime.now());
 
     return Scaffold(
@@ -139,8 +139,6 @@ class MyApp extends StatelessWidget {
               },
             ),
           ),
-
-
         ),
       ),
       body: Padding(
@@ -185,6 +183,7 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
 
     DataManager dataManager = DataManager();
     cities.add(await dataManager.searchForLocation("Los Angeles, California"));
+    cities.add(await dataManager.searchForLocation("New York City, New York"));
     List<HourlyPeriods> forecasts = [];
 
     for (var city in cities) {
@@ -312,5 +311,4 @@ Widget _buildWeatherBox(BuildContext context, String city, String temperature,
       ),
     ),
   );
-
 }
