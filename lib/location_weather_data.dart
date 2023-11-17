@@ -15,9 +15,25 @@ class LocationWeatherData {
   DateTime? hourlyForecastTimeStamp;
   DateTime? forecastTimeStamp;
 
-  LocationWeatherData(String location) {
+  Map<String, dynamic> toJson() => {
+        'weatherPointData': weatherPointData?.toJson(),
+        'searchInput': searchInput,
+        'displayableString': displayableString,
+      };
+  factory LocationWeatherData.fromJson(Map<String, dynamic> json) {
+    return LocationWeatherData(
+      weatherPointData: WeatherPoint.fromJson(json['weatherPointData']),
+      searchInput: json['searchInput'],
+      displayableString: json['displayableString'],
+    );
+  }
+  LocationWeatherData.defaultConstructor(String location) {
     searchInput = location;
   }
+  LocationWeatherData(
+      {required this.weatherPointData,
+      required this.searchInput,
+      required this.displayableString});
 
   Future<Forecast> weatherPointToForecast() async {
     if (forecast == null ||

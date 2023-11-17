@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -21,9 +23,17 @@ import 'package:weather_app/data_manager.dart';
 import 'api_manager.dart';
 import 'location_weather_data.dart';
 
-
-void main() {
+DataManager dataManager = DataManager();
+void main() async {
   runApp(const RootApp());
+  //RUN THE BELOW COMMENTED SECTION ONCE TO CREATE AND POPULATE THE FAVORITES
+  //FILE AND FAVORITES HASHMAP. COMMENT IT OUT AFTER TO WORK ON ONLY THE FAVORITED DATA
+  /* LocationWeatherData newLocation = await dataManager.searchForLocation("91331");
+  dataManager.addToFavorites(newLocation);
+  newLocation = await dataManager.searchForLocation("Los Angeles, California");
+  dataManager.addToFavorites(newLocation); */
+  await dataManager.loadFavorites(); // reads favorite file
+  var favorites = dataManager.getFavorites();
 }
 
 class RootApp extends StatelessWidget {
