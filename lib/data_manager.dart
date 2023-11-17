@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
@@ -132,14 +134,13 @@ class DataManager {
     return File('$path/Favorites_data.json');
   }
 
-  Future<File> saveFavoritesData(String jsonString) async {
-    //Map should go in ()
+  Future<File> _saveFavoritesData(String jsonString) async {
     final file = await _localFile;
     print("Writing to disk");
     return file.writeAsString(jsonString);
   }
 
-  Future<String> readFavoritesData() async {
+  Future<String> _readFavoritesData() async {
     try {
       final file = await _localFile;
 
@@ -153,30 +154,28 @@ class DataManager {
     }
   }
 
+  /// Asynchronous function that reads the user's favorites locations and
+  /// populates a _FavoriteLocations hashmap with the data.
   Future<void> loadFavorites() async {
-    String fileContents = await readFavoritesData();
+    String fileContents = await _readFavoritesData();
     if (fileContents != "Error reading file") {
       var favoritesData = json.decode(fileContents);
-
       _favoriteLocations = HashMap.from((favoritesData as Map<String, dynamic>)
           .map((key, value) =>
               MapEntry(key, LocationWeatherData.fromJson(value))));
     }
   }
 
+  /// Adds a LocationWeatherData object to the _FavoriteLocations hashmap, and asynchronously
+  /// writes the new location to the favorite locations JSON file.
   void addToFavorites(LocationWeatherData dataObj) async {
     _favoriteLocations[dataObj.searchInput!] = dataObj;
-    //serialize it
-    String data =
-        ""; /* 
-    _favoriteLocations.forEach((key, value) {
-      data += json.encode(value);
-    }); */
+    String data = "";
     data = json.encode(_favoriteLocations);
-    await saveFavoritesData(data);
-    //save it to disk as string
+    await _saveFavoritesData(data);
   }
 
+  /// Turns the _favoriteLocations hashmap into a list<LocationWeatherData> then returns it.
   List<LocationWeatherData> getFavorites() {
     List<LocationWeatherData> favoritesList = List.empty(growable: true);
     _favoriteLocations.forEach((key, value) {

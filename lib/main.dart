@@ -23,23 +23,17 @@ import 'package:weather_app/data_manager.dart';
 import 'api_manager.dart';
 import 'location_weather_data.dart';
 
-DataManager test1 = DataManager();
+DataManager dataManager = DataManager();
 void main() async {
   runApp(const RootApp());
-  /* LocationWeatherData newLocation = await test1.searchForLocation("91331");
-  test1.addToFavorites(newLocation);
-  newLocation = await test1.searchForLocation("Los Angeles, California");
-  test1.addToFavorites(newLocation); */
-  await test1.loadFavorites();
-  var favorites = test1.getFavorites();
-  processFavorites(favorites);
-}
-
-Future<void> processFavorites(List<LocationWeatherData> favorites) async {
-  await Future.forEach(favorites, (LocationWeatherData data) async {
-    var forecastData = await test1.getForecast(data, ForecastType.now);
-    print(forecastData.temperature);
-  });
+  //RUN THE BELOW COMMENTED SECTION ONCE TO CREATE AND POPULATE THE FAVORITES
+  //FILE AND FAVORITES HASHMAP. COMMENT IT OUT AFTER TO WORK ON ONLY THE FAVORITED DATA
+  /* LocationWeatherData newLocation = await dataManager.searchForLocation("91331");
+  dataManager.addToFavorites(newLocation);
+  newLocation = await dataManager.searchForLocation("Los Angeles, California");
+  dataManager.addToFavorites(newLocation); */
+  await dataManager.loadFavorites(); // reads favorite file
+  var favorites = dataManager.getFavorites();
 }
 
 class RootApp extends StatelessWidget {
