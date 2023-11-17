@@ -23,6 +23,7 @@ import 'package:weather_app/tests.dart';
 import 'package:weather_app/data_manager.dart';
 import 'api_manager.dart';
 import 'location_weather_data.dart';
+import 'tests.dart';
 
 DataManager dataManager = DataManager();
 void main() async {
@@ -178,6 +179,7 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
 
     DataManager dataManager = DataManager();
     cities.add(await dataManager.searchForLocation("Los Angeles, California"));
+    cities.add(await dataManager.searchForLocation("New York City, New York"));
     List<HourlyPeriods> forecasts = [];
 
     for (var city in cities) {
