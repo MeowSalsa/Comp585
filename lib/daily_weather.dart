@@ -41,7 +41,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
                   colorScheme.skyEndColor!,
                 ],
                 begin: Alignment.topCenter,
-                end: const Alignment(0.5, 0.75),
+                end: const Alignment(0.0, 0.75),
                 stops: const [0.0, 1.0],
                 tileMode: TileMode.clamp
               ),

@@ -21,6 +21,14 @@ class MajorWeatherDisplay extends StatelessWidget {
           size: iconSize,
         );
       case String s when (s.contains("Rain") || s.contains("Showers")):
+        if (s.contains("Chance"))
+        {
+          return Icon(
+            Icons.cloud_outlined,
+            color: Colors.white,
+            size: iconSize,
+          );
+        }
         return Icon(
           Icons.cloudy_snowing,
           color: Colors.white,
