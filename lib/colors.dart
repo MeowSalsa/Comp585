@@ -20,7 +20,7 @@ class TimeBasedColorScheme {
       Color(0xFF693BB2),
       Color(0xFF3C009D),
     ],
-    stops: [0.0, 0.42, 0.58, 0.75, 1.0],
+    stops: [0.0, 0.42, 0.58, 0.75, 1.0],  // 12 AM, 10 AM, 2 PM, 6 PM, 12 AM (Next day)
   );
 
   static LinearGradient skyEndColors = const LinearGradient(
@@ -65,21 +65,16 @@ class TimeBasedColorScheme {
     return colors.last;
   }
 
-  static TimeBasedColorScheme colorSchemeFromLocalTime(double? longitude) {
+  static TimeBasedColorScheme colorSchemeFromLocalTime(double? dayPercent) {
 
-    if (longitude == null)
+    if (dayPercent == null)
     {
       return TimeBasedColorScheme(
-        skyStartColor: Colors.black,
-        skyEndColor: Colors.black,
-        mainBGColor: Colors.black
+        skyStartColor: const Color(0xFF699EEE),
+        skyEndColor: const Color(0xFFD9E9F2),
+        mainBGColor: const Color(0xFF97D3BD)
       );
     }
-
-    int timeOffset = longitude ~/ 0.004167;
-
-    DateTime currentTime = DateTime.now().toUtc().add(Duration(seconds: timeOffset));
-    double dayPercent = (currentTime.hour / 24.0) + (currentTime.minute / 1440.0) + (currentTime.second / 86400.0);
 
     Color? currentSkyStartColor = lerpGradient(skyStartColors.colors, skyStartColors.stops!, dayPercent);
     Color? currentSkyEndColor = lerpGradient(skyEndColors.colors, skyEndColors.stops!, dayPercent);
