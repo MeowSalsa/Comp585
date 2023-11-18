@@ -130,19 +130,24 @@ class DataManager {
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    print("Path: ${path.toString()}");
-    return File('$path/Favorites_data.json');
+    final directory = Directory('$path\\Weather_Application\\Data');
+    if (!directory.existsSync()) {
+      directory.createSync(recursive: true);
+    }
+    //print("Path: ${directory.path.toString()}");
+    return File('${directory.path}\\Favorites_data.json');
   }
 
   Future<File> _saveFavoritesData(String jsonString) async {
     final file = await _localFile;
-    print("Writing to disk");
+    print("Writing to disk on ${file.path}");
     return file.writeAsString(jsonString);
   }
 
   Future<String> _readFavoritesData() async {
     try {
       final file = await _localFile;
+      print("Reading from disk on ${file.path}");
 
       // Read the file
       final contents = await file.readAsString();
@@ -198,8 +203,5 @@ class DataManager {
 
   HourlyPeriods getNowForecast(LocationWeatherData currentLocation) {
     return currentLocation.nowForecast!;
-
-    /*  _getHourlyForecast(currentLocation.searchInput!);
-    return currentLocation.nowForecast!; */
   }
 }
