@@ -1,5 +1,4 @@
 // ignore_for_file: avoid_print
-//ignore this comment just testing to pull to github - Alan
 
 import 'dart:collection';
 
@@ -23,20 +22,23 @@ import 'package:weather_app/tests.dart';
 import 'package:weather_app/data_manager.dart';
 import 'api_manager.dart';
 import 'location_weather_data.dart';
-import 'tests.dart';
 
 DataManager dataManager = DataManager();
 void main() async {
-  runApp(const RootApp());
-  //RUN THE BELOW COMMENTED SECTION ONCE TO CREATE AND POPULATE THE FAVORITES
-  //FILE AND FAVORITES HASHMAP. COMMENT IT OUT AFTER TO WORK ON ONLY THE FAVORITED DATA
-  /* LocationWeatherData newLocation =
-      await dataManager.searchForLocation("91331");
-  dataManager.addToFavorites(newLocation);
+  WidgetsFlutterBinding.ensureInitialized();
+  //Load favorites from file
+  await dataManager.loadFavorites();
+  /* var newLocation = await dataManager.searchForLocation("Eugene, Oregon");
+  await dataManager.addToFavorites(newLocation);
+  newLocation = await dataManager.searchForLocation("91331");
+  await dataManager.addToFavorites(newLocation);
   newLocation = await dataManager.searchForLocation("Los Angeles, California");
-  dataManager.addToFavorites(newLocation); */
-  await dataManager.loadFavorites(); // reads favorite file
-  var favorites = dataManager.getFavorites();
+  await dataManager.addToFavorites(newLocation);
+  newLocation = await dataManager.searchForLocation("Houston, Texas");
+  await dataManager.addToFavorites(newLocation);
+  newLocation = await dataManager.searchForLocation("New York, New York");
+  await dataManager.addToFavorites(newLocation); */
+  runApp(const RootApp());
 }
 
 class RootApp extends StatelessWidget {
@@ -167,11 +169,14 @@ class CurvedSquareIcon extends StatefulWidget {
 
 class _CurvedSquareIconState extends State<CurvedSquareIcon> {
   late Future<List<HourlyPeriods>> weatherForecasts;
+  late List<LocationWeatherData> favoriteLocations;
 
   @override
   void initState() {
     super.initState();
     weatherForecasts = fetchWeatherForecasts();
+    favoriteLocations = dataManager.getFavorites();
+    print(favoriteLocations.length);
   }
 
   Future<List<HourlyPeriods>> fetchWeatherForecasts() async {
@@ -192,59 +197,19 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
     return forecasts;
   }
 
-  // Future<List<HourlyPeriods>> fetchWeatherForecasts() async {
-  //   List<LocationWeatherData> cities = List.empty(growable: true);
-
-  //   DataManager dataManager = DataManager();
-  //   cities.add(await dataManager.searchForLocation("Los Angeles, California"));
-  //   cities.add(await dataManager.searchForLocation("New York City, New York"));
-  //   cities.add(await dataManager.searchForLocation("Las Vegas, Nevada"));
-  //   cities.add(await dataManager.searchForLocation("Boston, Massachusetts"));
-  //   cities.add(await dataManager.searchForLocation("Miami, Florida"));
-  //   cities.add(await dataManager.searchForLocation("Austin, Texas"));
-  //   List<HourlyPeriods> forecasts = [];
-
-  //   for (var city in cities) {
-  //     try {
-  //       HourlyPeriods forecast =
-  //           await dataManager.getForecast(city, ForecastType.now);
-  //       forecasts.add(forecast);
-  //     } catch (e) {
-  //       print('Error fetching forecast for $city: $e');
-  //       // Handle the error or add a placeholder
-  //     }
-  //   }
-  //   return forecasts;
-  // }
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<HourlyPeriods>>(
-      future: weatherForecasts,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return const Text("Error fetching weather data");
-        } else if (snapshot.hasData) {
-          return GridView.count(
-            crossAxisCount: 2,
-            children: snapshot.data!
-                .map((forecast) => _buildWeatherBox(
-                      context,
-                      forecast.name ?? 'Unknown Location',
-                      '${forecast.temperature ?? 'N/A'}°',
-                      forecast.shortForecast ?? 'Unavailable',
-                      getIconForCondition(forecast.shortForecast),
-                      getColorForTemperature(forecast.temperature),
-                    ))
-                .toList(),
-          );
-        } else {
-          return const Text('No weather data available');
-        }
-      },
-    );
+    if (favoriteLocations.isNotEmpty) {
+      return GridView.count(
+        crossAxisCount: 2,
+        children: favoriteLocations
+            .map((favoriteLocations) =>
+                _buildWeatherBoxWithLocationObject(context, favoriteLocations))
+            .toList(),
+      );
+    } else {
+      return const Text('No weather data available');
+    }
   }
 
   IconData getIconForCondition(String? iconCode) {
@@ -257,6 +222,61 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
     // Implement your own logic to return a color based on the temperature
     // This is just a placeholder
     return Colors.yellow;
+  }
+
+  Widget _buildWeatherBoxWithLocationObject(
+      BuildContext context, LocationWeatherData location) {
+    var city = location.displayableString ?? 'Unknown Location';
+    var currentForecast = dataManager.getNowForecast(location);
+    var temperature = '${currentForecast.temperature ?? 'N/A'}°';
+    String weather = currentForecast.shortForecast ?? 'Unavailable';
+    IconData icon =
+        getIconForCondition(dataManager.getNowForecast(location).shortForecast);
+    Color iconColor = getColorForTemperature(
+        dataManager.getNowForecast(location).temperature);
+
+    // This widget builds each individual weather box with the city, temperature, and weather condition.
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DetailScreen(city: city),
+            ),
+          );
+        },
+        child: Container(
+          width: 150.0,
+          height: 150.0,
+          decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.3),
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(city,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 14)),
+                const SizedBox(height: 5),
+                Icon(icon, size: 40, color: iconColor),
+                const SizedBox(height: 5),
+                Text(temperature,
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 5),
+                Text(weather, style: const TextStyle(fontSize: 12)),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 //---------------------------------------------------
