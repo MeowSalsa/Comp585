@@ -7,6 +7,7 @@ class LocationWeatherData {
   WeatherPoint? weatherPointData;
   Forecast? forecast;
   HourlyForecast? hourlyForecast;
+  HourlyPeriods? nowForecast;
   double? lat;
   double? long;
   Location? location;
@@ -51,6 +52,7 @@ class LocationWeatherData {
             const Duration(hours: 1))) {
       hourlyForecast = await APIManager().getHourlyForecast(weatherPointData!);
       hourlyForecastTimeStamp = DateTime.now();
+      nowForecast = hourlyForecast?.properties?.periods?.first;
     }
     return hourlyForecast!;
   }

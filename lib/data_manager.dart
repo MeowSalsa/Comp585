@@ -19,16 +19,16 @@ class DataManager {
     String locationString = locationData.searchInput!;
     switch (forecastType) {
       case ForecastType.now:
-        var nowForecast = _getNowForecast(locationString);
+        var nowForecast = await _getNowForecast(locationString);
         return nowForecast;
       case ForecastType.hourly:
-        var hourlyForecast = _getHourlyForecast(locationString);
+        var hourlyForecast = await _getHourlyForecast(locationString);
         return hourlyForecast;
       case ForecastType.daily:
-        var dailyForecast = _getDayForecast(locationString);
+        var dailyForecast = await _getDayForecast(locationString);
         return dailyForecast;
       case ForecastType.weekly:
-        var forecast = _getWeeklyForecast(locationString);
+        var forecast = await _getWeeklyForecast(locationString);
         return forecast;
       default:
         print("Something went wrong in ForecastType switch");
@@ -130,19 +130,24 @@ class DataManager {
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    print("Path: ${path.toString()}");
-    return File('$path/Favorites_data.json');
+    final directory = Directory('$path\\Weather_Application\\Data');
+    if (!directory.existsSync()) {
+      directory.createSync(recursive: true);
+    }
+    //print("Path: ${directory.path.toString()}");
+    return File('${directory.path}\\Favorites_data.json');
   }
 
   Future<File> _saveFavoritesData(String jsonString) async {
     final file = await _localFile;
-    print("Writing to disk");
+    print("Writing to disk on ${file.path}");
     return file.writeAsString(jsonString);
   }
 
   Future<String> _readFavoritesData() async {
     try {
       final file = await _localFile;
+      print("Reading from disk on ${file.path}");
 
       // Read the file
       final contents = await file.readAsString();
@@ -157,6 +162,7 @@ class DataManager {
   /// Asynchronous function that reads the user's favorites locations and
   /// populates a _FavoriteLocations hashmap with the data.
   Future<void> loadFavorites() async {
+    print("Loading...");
     String fileContents = await _readFavoritesData();
     if (fileContents != "Error reading file") {
       if (fileContents.isNotEmpty) {
@@ -164,7 +170,16 @@ class DataManager {
         _favoriteLocations = HashMap.from(
             (favoritesData as Map<String, dynamic>).map((key, value) =>
                 MapEntry(key, LocationWeatherData.fromJson(value))));
+        await initializeFavoriteForecasts();
       }
+    }
+  }
+
+  ///Initializes the hourlyForecasts that the Main Menu requires.
+  Future<void> initializeFavoriteForecasts() async {
+    for (var value in _favoriteLocations.values) {
+      print("Initializing Hourly Forecast for ${value.searchInput}");
+      await _getHourlyForecast(value.searchInput!);
     }
   }
 
@@ -184,5 +199,9 @@ class DataManager {
       favoritesList.add(value);
     });
     return favoritesList;
+  }
+
+  HourlyPeriods getNowForecast(LocationWeatherData currentLocation) {
+    return currentLocation.nowForecast!;
   }
 }
