@@ -28,7 +28,8 @@ void main() async {
   runApp(const RootApp());
   //RUN THE BELOW COMMENTED SECTION ONCE TO CREATE AND POPULATE THE FAVORITES
   //FILE AND FAVORITES HASHMAP. COMMENT IT OUT AFTER TO WORK ON ONLY THE FAVORITED DATA
-  /* LocationWeatherData newLocation = await dataManager.searchForLocation("91331");
+  /* LocationWeatherData newLocation =
+      await dataManager.searchForLocation("91331");
   dataManager.addToFavorites(newLocation);
   newLocation = await dataManager.searchForLocation("Los Angeles, California");
   dataManager.addToFavorites(newLocation); */
