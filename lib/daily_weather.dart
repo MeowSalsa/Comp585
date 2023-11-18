@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'api_manager.dart';
 import 'data_manager.dart';
 import 'colors.dart';
+import 'local_time.dart';
 import 'location_weather_data.dart';
 import 'weather_displays.dart';
 class CurrentWeatherDisplay extends StatelessWidget {
@@ -29,7 +30,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
           return const CircularProgressIndicator();
         }
 
-        final TimeBasedColorScheme colorScheme = TimeBasedColorScheme.colorSchemeFromLocalTime(weatherData.locationLongitude);
+        final TimeBasedColorScheme colorScheme = TimeBasedColorScheme.colorSchemeFromLocalTime(LocalTime.getLocalDayPercent(weatherData.locationLongitude));
 
         return Scaffold(
           
@@ -37,11 +38,11 @@ class CurrentWeatherDisplay extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  colorScheme.skyStartColor!,
-                  colorScheme.skyEndColor!,
+                  colorScheme.skyStartColor,
+                  colorScheme.skyEndColor,
                 ],
                 begin: Alignment.topCenter,
-                end: const Alignment(0.0, 0.75),
+                end: const Alignment(0.5, 0.75),
                 stops: const [0.0, 1.0],
                 tileMode: TileMode.clamp
               ),
@@ -80,11 +81,11 @@ class CurrentWeatherDisplay extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Padding(padding: EdgeInsets.only(top: screenWidth / 13.1)),
 
                         // MAJOR WEATHER DISPLAY
                         MajorWeatherDisplay(
                           temperatureLabel: "${weatherData.currentTemp}\u00B0${weatherData.currentUnits}", 
+                          longitude: weatherData.locationLongitude,
                           conditionLabel: "${weatherData.currentCond}",
                         ),
 

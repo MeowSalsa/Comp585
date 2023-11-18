@@ -1,64 +1,160 @@
 import 'package:flutter/material.dart';
 
+import 'local_time.dart';
+import 'weather_icons.dart';
+
 class MajorWeatherDisplay extends StatelessWidget {
 
   final String temperatureLabel;
   final String conditionLabel;
+  final double? longitude;
 
   const MajorWeatherDisplay({
     super.key,
     required this.temperatureLabel,
     required this.conditionLabel,
+    required this.longitude,
   });
 
-  Icon getConditionIcon(String condition, double iconSize) {
+  Widget getConditionIcon(String condition, double iconSize) {
+    
+    Widget sun = Padding(
+      padding: EdgeInsets.only(top: iconSize / 3.0, bottom: iconSize / 3.0),
+      child: Icon(
+        WeatherIcons.sun,
+        color: const Color(0xFFFFF386),
+        size: iconSize,
+      ),
+    );
 
-    switch(condition) {
-      case String s when s.contains("Cloudy"):
-        return Icon(
-          Icons.cloud_outlined,
+    Widget moon = Padding(
+      padding: EdgeInsets.only(top: iconSize / 3.0, bottom: iconSize / 3.0),
+      child: Icon(
+        WeatherIcons.moon,
+        color: Colors.white,
+        size: iconSize * 0.8,
+      )
+    );
+
+    Widget partlySun = Stack(
+      children: [
+        Icon(
+          WeatherIcons.sun_partly,
+          color: const Color(0xFFFFF386),
+          size: iconSize * 1.4,
+        ),
+        Icon(
+          WeatherIcons.cloud_partly,
           color: Colors.white,
-          size: iconSize,
-        );
-      case String s when (s.contains("Rain") || s.contains("Showers")):
-        if (s.contains("Chance"))
-        {
-          return Icon(
-            Icons.cloud_outlined,
+          size: iconSize * 1.4,
+        ),
+      ],
+    );
+
+    Widget partlyMoon = Stack(
+      children: [
+        Icon(
+          WeatherIcons.moon_partly,
+          color: Colors.white,
+          size: iconSize * 1.4,
+        ),
+        Icon(
+          WeatherIcons.cloud_partly,
+          color: Colors.white,
+          size: iconSize * 1.4,
+        ),
+      ],
+    );
+
+    Widget cloudy = Padding(
+      padding: EdgeInsets.all(iconSize / 4.0),
+      child: Icon(
+        WeatherIcons.cloud,
+        color: Colors.white,
+        size: iconSize,
+      ),
+    );
+
+    Widget rainy = Padding(
+      padding: EdgeInsets.all(iconSize / 4.0),
+        child: Stack(
+        children: [
+          Icon(
+            WeatherIcons.cloud_precipitation,
             color: Colors.white,
             size: iconSize,
-          );
+          ),
+          Icon(
+            WeatherIcons.rain,
+            color: const Color(0xFF60C0F6),
+            size: iconSize,
+          ),
+        ],
+      ),
+    );
+
+    Widget snowy = Padding(
+      padding: EdgeInsets.all(iconSize / 4.0),
+      child: Stack(
+        children: [
+          Icon(
+            WeatherIcons.cloud_precipitation,
+            color: Colors.white,
+            size: iconSize,
+          ),
+          Icon(
+            WeatherIcons.snow,
+            color: Colors.white,
+            size: iconSize,
+          ),
+        ],
+      ),
+    );
+
+    switch(condition) {
+      case String s when (s.contains("Cloudy") || s.contains("Fog")):
+        if (s.contains("Partly"))
+        {
+          double dayPercent = LocalTime.getLocalDayPercent(longitude);
+          if (dayPercent > 0.25 && dayPercent < 0.75)
+          {
+            return partlySun;
+          }
+          else
+          {
+            return partlyMoon;
+          }
         }
-        return Icon(
-          Icons.cloudy_snowing,
-          color: Colors.white,
-          size: iconSize,
-        );
+        return cloudy;
+
+      case String s when (s.contains("Rain") || s.contains("Showers")):
+        if (s.contains("Chance") || s.contains("Likely"))
+        {
+          return cloudy;
+        }
+        return rainy;
+
       case String s when s.contains("Snow"):
-        return Icon(
-          Icons.ac_unit,
-          color: Colors.white,
-          size: iconSize,
-        );
+        return snowy;
+
+      case String s when s.contains("Clear"):
+        return moon;
+
       default:
-        return Icon(
-          Icons.wb_sunny_outlined,
-          color: const Color(0xFFFFF386),
-          size: iconSize,
-        );
+        return sun;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Column(
       children: [
         // Condition icon
         Container(
-          padding: EdgeInsets.all(screenWidth / 36.0),
-          child: getConditionIcon(conditionLabel, screenWidth / 2.0)
+          child: getConditionIcon(conditionLabel, screenWidth / 2.2),
         ),
 
         // Temperature
@@ -184,7 +280,7 @@ class PrecipitationDisplay extends StatelessWidget {
         children: [
           Padding(padding: EdgeInsets.only(top: screenWidth / 48.0)),
           Icon(
-            Icons.snowing,
+            WeatherIcons.precipitation,
             color: Colors.white,
             size: screenWidth * (3.0 / 20.0),
           ),
@@ -220,7 +316,7 @@ class HumidityDisplay extends StatelessWidget {
         children: [
           Padding(padding: EdgeInsets.only(top: screenWidth / 48.0)),
           Icon(
-            Icons.wind_power,
+            WeatherIcons.humidity,
             color: Colors.white,
             size: screenWidth * (3.0 / 20.0),
           ),
