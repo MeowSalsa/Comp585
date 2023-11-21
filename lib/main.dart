@@ -23,6 +23,8 @@ import 'package:weather_app/data_manager.dart';
 import 'api_manager.dart';
 import 'location_weather_data.dart';
 
+import 'daily_weather.dart';
+
 DataManager dataManager = DataManager();
 void main() async {
   runApp(const RootApp());
@@ -202,7 +204,7 @@ class CurvedSquareIcon extends StatelessWidget {
             Navigator.push(
               innerContext,
               MaterialPageRoute(
-                builder: (context) => DetailScreen(city: city),
+                builder: (context) => CurrentWeatherDisplay(locationString: city),
               ),
             );
           },
