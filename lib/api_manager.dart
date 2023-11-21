@@ -243,6 +243,7 @@ class HourlyForecastProperties {
   String? generatedAt;
   String? updateTime;
   String? validTimes;
+  Elevation? elevation;
   List<HourlyPeriods>? periods;
 
   HourlyForecastProperties(
@@ -261,6 +262,9 @@ class HourlyForecastProperties {
     generatedAt = json['generatedAt'];
     updateTime = json['updateTime'];
     validTimes = json['validTimes'];
+    elevation = json['elevation'] != null
+        ? Elevation.fromJson(json['elevation'])
+        : null;
     if (json['periods'] != null) {
       periods = <HourlyPeriods>[];
       json['periods'].forEach((v) {
@@ -279,6 +283,7 @@ class HourlyPeriods {
   int? temperature;
   String? temperatureUnit;
   ProbabilityOfPrecipitation? probabilityOfPrecipitation;
+  Elevation? dewpoint;
   ProbabilityOfPrecipitation? relativeHumidity;
   String? windSpeed;
   String? windDirection;
@@ -295,6 +300,7 @@ class HourlyPeriods {
       this.temperature,
       this.temperatureUnit,
       this.probabilityOfPrecipitation,
+      this.dewpoint,
       this.relativeHumidity,
       this.windSpeed,
       this.windDirection,
@@ -314,6 +320,8 @@ class HourlyPeriods {
         ? ProbabilityOfPrecipitation.fromJson(
             json['probabilityOfPrecipitation'])
         : null;
+    dewpoint =
+        json['dewpoint'] != null ? Elevation.fromJson(json['dewpoint']) : null;
     relativeHumidity = json['relativeHumidity'] != null
         ? ProbabilityOfPrecipitation.fromJson(json['relativeHumidity'])
         : null;
@@ -322,18 +330,6 @@ class HourlyPeriods {
     icon = json['icon'];
     shortForecast = json['shortForecast'];
     detailedForecast = json['detailedForecast'];
-  }
-}
-
-class HourlyProbabilityOfPrecipitation {
-  String? unitCode;
-  int? value;
-
-  HourlyProbabilityOfPrecipitation({this.unitCode, this.value});
-
-  HourlyProbabilityOfPrecipitation.fromJson(Map<String, dynamic> json) {
-    unitCode = json['unitCode'];
-    value = json['value'];
   }
 }
 
@@ -402,7 +398,7 @@ class AddressComponents {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['long_name'] = longName;
     data['short_name'] = shortName;
     data['types'] = types;
