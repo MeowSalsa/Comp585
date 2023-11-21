@@ -108,6 +108,7 @@ class ForecastProperties {
   String? generatedAt;
   String? updateTime;
   String? validTimes;
+  Elevation? elevation;
   List<Periods>? periods;
 
   ForecastProperties(
@@ -117,6 +118,7 @@ class ForecastProperties {
       this.generatedAt,
       this.updateTime,
       this.validTimes,
+      this.elevation,
       this.periods});
 
   ForecastProperties.fromJson(Map<String, dynamic> json) {
@@ -126,12 +128,27 @@ class ForecastProperties {
     generatedAt = json['generatedAt'];
     updateTime = json['updateTime'];
     validTimes = json['validTimes'];
+    elevation = json['elevation'] != null
+        ? Elevation.fromJson(json['elevation'])
+        : null;
     if (json['periods'] != null) {
       periods = <Periods>[];
       json['periods'].forEach((v) {
         periods!.add(Periods.fromJson(v));
       });
     }
+  }
+}
+
+class Elevation {
+  String? unitCode;
+  num? value;
+
+  Elevation({this.unitCode, this.value});
+
+  Elevation.fromJson(Map<String, dynamic> json) {
+    unitCode = json['unitCode'];
+    value = json['value'];
   }
 }
 
@@ -145,6 +162,7 @@ class Periods {
   String? temperatureUnit;
   ProbabilityOfPrecipitation? probabilityOfPrecipitation;
   ProbabilityOfPrecipitation? relativeHumidity;
+  Elevation? dewpoint;
   String? windSpeed;
   String? windDirection;
   String? icon;
@@ -161,6 +179,7 @@ class Periods {
       this.temperatureUnit,
       this.probabilityOfPrecipitation,
       this.relativeHumidity,
+      this.dewpoint,
       this.windSpeed,
       this.windDirection,
       this.icon,
@@ -179,6 +198,8 @@ class Periods {
         ? ProbabilityOfPrecipitation.fromJson(
             json['probabilityOfPrecipitation'])
         : null;
+    dewpoint =
+        json['dewpoint'] != null ? Elevation.fromJson(json['dewpoint']) : null;
     relativeHumidity = json['relativeHumidity'] != null
         ? ProbabilityOfPrecipitation.fromJson(json['relativeHumidity'])
         : null;
