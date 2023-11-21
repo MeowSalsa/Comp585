@@ -19,7 +19,7 @@ class MajorWeatherDisplay extends StatelessWidget {
   Widget getConditionIcon(String condition, double iconSize) {
     
     Widget sun = Padding(
-      padding: EdgeInsets.only(top: iconSize / 3.0, bottom: iconSize / 3.0),
+      padding: EdgeInsets.only(top: iconSize / 4.0, bottom: iconSize / 4.0),
       child: Icon(
         WeatherIcons.sun,
         color: const Color(0xFFFFF386),
@@ -28,7 +28,7 @@ class MajorWeatherDisplay extends StatelessWidget {
     );
 
     Widget moon = Padding(
-      padding: EdgeInsets.only(top: iconSize / 3.0, bottom: iconSize / 3.0),
+      padding: EdgeInsets.only(top: iconSize / 2.9, bottom: iconSize / 2.9),
       child: Icon(
         WeatherIcons.moon,
         color: Colors.white,
@@ -36,34 +36,40 @@ class MajorWeatherDisplay extends StatelessWidget {
       )
     );
 
-    Widget partlySun = Stack(
-      children: [
-        Icon(
-          WeatherIcons.sun_partly,
-          color: const Color(0xFFFFF386),
-          size: iconSize * 1.4,
-        ),
-        Icon(
-          WeatherIcons.cloud_partly,
-          color: Colors.white,
-          size: iconSize * 1.4,
-        ),
-      ],
+    Widget partlySun = Padding(
+      padding: EdgeInsets.all(iconSize / 20.0),
+      child: Stack(
+        children: [
+          Icon(
+            WeatherIcons.sun_partly,
+            color: const Color(0xFFFFF386),
+            size: iconSize * 1.4,
+          ),
+          Icon(
+            WeatherIcons.cloud_partly,
+            color: Colors.white,
+            size: iconSize * 1.4,
+          ),
+        ],
+      ),
     );
 
-    Widget partlyMoon = Stack(
-      children: [
-        Icon(
-          WeatherIcons.moon_partly,
-          color: Colors.white,
-          size: iconSize * 1.4,
-        ),
-        Icon(
-          WeatherIcons.cloud_partly,
-          color: Colors.white,
-          size: iconSize * 1.4,
-        ),
-      ],
+    Widget partlyMoon = Padding(
+      padding: EdgeInsets.all(iconSize / 20.0),
+      child: Stack(
+        children: [
+          Icon(
+            WeatherIcons.moon_partly,
+            color: Colors.white,
+            size: iconSize * 1.4,
+          ),
+          Icon(
+            WeatherIcons.cloud_partly,
+            color: Colors.white,
+            size: iconSize * 1.4,
+          ),
+        ],
+      ),
     );
 
     Widget cloudy = Padding(
@@ -113,7 +119,7 @@ class MajorWeatherDisplay extends StatelessWidget {
 
     switch(condition) {
       case String s when (s.contains("Cloudy") || s.contains("Fog")):
-        if (s.contains("Partly"))
+        if (s.contains("Partly") || s.contains("Mostly"))
         {
           double dayPercent = LocalTime.getLocalDayPercent(longitude);
           if (dayPercent > 0.25 && dayPercent < 0.75)
