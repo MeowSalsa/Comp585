@@ -129,7 +129,7 @@ class MyApp extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DetailScreen(city: _controller.text),
+                    builder: (context) => CurrentWeatherDisplay(locationString: _controller.text),
                   ),
                 );
               },

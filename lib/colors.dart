@@ -67,16 +67,7 @@ class TimeBasedColorScheme {
 
   static TimeBasedColorScheme colorSchemeFromLocalTime(double? dayPercent) {
 
-    if (dayPercent == null)
-    {
-      return TimeBasedColorScheme(
-        skyStartColor: const Color(0xFF699EEE),
-        skyEndColor: const Color(0xFFD9E9F2),
-        mainBGColor: const Color(0xFF97D3BD)
-      );
-    }
-
-    Color? currentSkyStartColor = lerpGradient(skyStartColors.colors, skyStartColors.stops!, dayPercent);
+    Color? currentSkyStartColor = lerpGradient(skyStartColors.colors, skyStartColors.stops!, dayPercent!);
     Color? currentSkyEndColor = lerpGradient(skyEndColors.colors, skyEndColors.stops!, dayPercent);
     Color? currentBGColor = lerpGradient(mainBGColors.colors, mainBGColors.stops!, dayPercent);
 
