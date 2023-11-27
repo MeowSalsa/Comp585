@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import 'local_time.dart';
@@ -118,19 +120,18 @@ class MajorWeatherDisplay extends StatelessWidget {
     );
 
     switch(condition) {
-      case String s when (s.contains("Cloudy") || s.contains("Fog")):
-        if (s.contains("Partly") || s.contains("Mostly"))
+      case String s when (s.contains("Partly") || s.contains("Mostly")):
+        double dayPercent = LocalTime.getLocalDayPercent(longitude);
+        if (dayPercent > 0.25 && dayPercent < 0.75)
         {
-          double dayPercent = LocalTime.getLocalDayPercent(longitude);
-          if (dayPercent > 0.25 && dayPercent < 0.75)
-          {
-            return partlySun;
-          }
-          else
-          {
-            return partlyMoon;
-          }
+          return partlySun;
         }
+        else
+        {
+          return partlyMoon;
+        }
+        
+      case String s when (s.contains("Cloudy") || s.contains("Fog")):
         return cloudy;
 
       case String s when (s.contains("Rain") || s.contains("Showers")):
@@ -251,16 +252,131 @@ class WindDisplay extends StatelessWidget {
     required this.windDirection
   });
 
+  double directionToRotation(String dir)
+  {
+    double rotation = 0;
+
+    double rotationInfluence = 90.0;
+    for (int i = 0; i < dir.length; i++)
+    {
+      double correctRotInf;
+      switch (dir.substring(i, i + 1))
+      {
+        case 'N':
+          correctRotInf = (i > 0) ? correctRotationInfluence(0, rotation, rotationInfluence) : 0;
+          rotation += (((rotation + correctRotInf) - 0).abs() < (rotation - 0).abs()) ? correctRotInf : 0.0;
+          break;
+        case 'E':
+          correctRotInf = (i > 0) ? correctRotationInfluence(90, rotation, rotationInfluence) : 90;
+          rotation += (((rotation + correctRotInf) - 90).abs() < (rotation - 90).abs()) ? correctRotInf : 0.0;
+          break;
+        case 'S':
+          // check if current angle is closer to +180 than -180
+          int targetRot = 180;
+          if (rotation >= 0)
+          {
+            // make influence move closer to +180 if positive
+            correctRotInf = (i > 0) ? correctRotationInfluence(180, rotation, rotationInfluence) : 180;
+          }
+          else
+          {
+            // make influence move closer to -180 if negative
+            targetRot = -180;
+            correctRotInf = (i > 0) ? correctRotationInfluence(-180, rotation, rotationInfluence) : -180;
+          }
+          rotation += (((rotation + correctRotInf) - targetRot).abs() < (rotation - targetRot).abs()) ? correctRotInf : 0.0;
+          break;
+        case 'W':
+          if (rotation > 0)
+          {
+            rotation = -rotation;
+          }
+          correctRotInf = (i > 0) ? correctRotationInfluence(-90, rotation, rotationInfluence) : -90;
+          rotation += (((rotation + correctRotInf) + 90).abs() < (rotation + 90).abs()) ? correctRotInf : 0.0;
+          break;
+      }
+
+      rotationInfluence /= 2.0;
+    }
+
+    return rotation;
+  }
+
+  double correctRotationInfluence(double targetRot, double currentRot, double rotInf)
+  {
+    return (currentRot < targetRot) ? rotInf : -rotInf;
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    double compassSize = screenWidth / 4;
+    double needleAngle = (windDirection != null) ? directionToRotation(windDirection!) * (pi / 180) : 0;
+    
+    String windSpeedValue = (windSpeed != null && windSpeed!.length > 3) ? windSpeed!.substring(0, windSpeed!.indexOf(" ")) : "";
+    String windSpeedUnit = (windSpeed != null) ? windSpeed!.substring(windSpeed!.indexOf(" ") + 1) : "";
 
     return MinorWeatherDisplay(
       titleText: "WIND", 
-      displayWidget: Text(
-        "$windSpeed $windDirection",
-        style: TextStyle(
-          fontSize: screenWidth / 22.5,
+      displayWidget: Center(
+        child: Stack(
+          children: [
+            SizedBox(
+              width: compassSize,
+              height: compassSize,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(screenWidth / 6.8),
+                  color: Colors.transparent,
+                  border: Border.all(width: 5, color: Colors.white),
+                ),
+              ),
+            ),
+
+            Transform.rotate(
+              angle: needleAngle,
+              child: SizedBox(
+                width: compassSize,
+                height: compassSize,
+                child: Center(
+                  child: SizedBox(
+                    width: 10,
+                    height: compassSize,
+                    child: const DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.only(topLeft: Radius.elliptical(5, 10), topRight: Radius.elliptical(5, 10)),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            SizedBox(
+              width: compassSize,
+              height: compassSize,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      windSpeedValue,
+                      style: TextStyle(
+                        fontSize: screenWidth / 22.5,
+                      ),
+                    ),
+                    Text(
+                      windSpeedUnit,
+                      style: TextStyle(
+                        fontSize: screenWidth / 22.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -329,6 +445,42 @@ class HumidityDisplay extends StatelessWidget {
           Padding(padding: EdgeInsets.only(top: screenWidth / 24.0)),
           Text(
             "$humidityPercent",
+            style: TextStyle(
+              fontSize: screenWidth / 22.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DewPointDisplay extends StatelessWidget {
+  
+  final String? dewPoint;
+
+  const DewPointDisplay({
+    super.key,
+    required this.dewPoint,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    return MinorWeatherDisplay(
+      titleText: "DEW POINT", 
+      displayWidget: Column(
+        children: [
+          Padding(padding: EdgeInsets.only(top: screenWidth / 48.0)),
+          Icon(
+            WeatherIcons.dew_point,
+            color: Colors.white,
+            size: screenWidth * (3.0 / 20.0),
+          ),
+          Padding(padding: EdgeInsets.only(top: screenWidth / 24.0)),
+          Text(
+            "$dewPoint",
             style: TextStyle(
               fontSize: screenWidth / 22.5,
             ),

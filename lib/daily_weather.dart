@@ -61,7 +61,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
 
                     // Location label
                     Padding(
-                      padding: EdgeInsets.only(left: screenWidth / 24.0, top: screenWidth / 24.0),
+                      padding: EdgeInsets.only(left: screenWidth / 28.0, top: screenWidth / 24.0),
 
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -71,12 +71,30 @@ class CurrentWeatherDisplay extends StatelessWidget {
                             child: FittedBox(
                               fit: BoxFit.scaleDown,
                               clipBehavior: Clip.hardEdge,
-                              child: Text(
-                                "${weatherData.currentCity}, ${weatherData.currentState}",
-                                maxLines: 1,
-                                style: TextStyle(
-                                  fontSize: screenWidth / 20.0,
-                                  fontWeight: FontWeight.bold,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.arrow_back_ios_new_rounded,
+                                      color: Colors.white,
+                                      size: screenWidth / 18.0,
+                                    ),
+
+                                    Padding(padding: EdgeInsets.only(left: screenWidth / 72.0)),
+
+                                    Text(
+                                      "${weatherData.currentCity}, ${weatherData.currentState}",
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                        fontSize: screenWidth / 20.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -116,6 +134,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                     WindDisplay(windSpeed: weatherData.currentWindSpeed, windDirection: weatherData.currentWindDirection,),
                                     PrecipitationDisplay(precipitationChance: weatherData.currentPrecipitationChance,),
                                     HumidityDisplay(humidityPercent: weatherData.currentHumidity,),
+                                    DewPointDisplay(dewPoint: weatherData.currentHumidity,),
                                   ],
                                 ),
 
@@ -155,6 +174,7 @@ class WeatherData {
   String? currentWindDirection = "";
   String? currentPrecipitationChance;
   String? currentHumidity;
+  String? currentDewPoint;
   String? time;
   double? locationLongitude;
 
