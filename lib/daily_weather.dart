@@ -87,7 +87,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                     Padding(padding: EdgeInsets.only(left: screenWidth / 72.0)),
 
                                     Text(
-                                      "${weatherData.currentCity}, ${weatherData.currentState}",
+                                      "${weatherData.currentCity}",
                                       maxLines: 1,
                                       style: TextStyle(
                                         fontSize: screenWidth / 20.0,
@@ -166,7 +166,6 @@ class WeatherData {
   });
 
   String? currentCity = "";
-  String? currentState = "";
   int? currentTemp = 0;
   String? currentUnits = "";
   String? currentCond = "";
@@ -190,13 +189,11 @@ class WeatherData {
     DataManager newDM = DataManager();
     LocationWeatherData weatherLocation = await newDM.searchForLocation(locationString!);
     HourlyForecast forecast = await newDM.getForecast(weatherLocation, ForecastType.hourly);
-    RelativeLocation? currentLocation = weatherLocation.weatherPointData!.properties!.relativeLocation;
     HourlyPeriods currentPeriod = forecast.properties!.periods![0];
     ProbabilityOfPrecipitation? precipitation = currentPeriod.probabilityOfPrecipitation;
     ProbabilityOfPrecipitation? humidity = currentPeriod.relativeHumidity;
 
-    currentCity = currentLocation!.properties!.city;
-    currentState = currentLocation.properties!.state;
+    currentCity = weatherLocation.displayableString;
     currentTemp = currentPeriod.temperature;
     currentUnits = currentPeriod.temperatureUnit;
     currentCond = currentPeriod.shortForecast;
