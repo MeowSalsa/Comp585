@@ -225,18 +225,18 @@ class ProbabilityOfPrecipitation {
 
 //Hourly Forecast classes
 class HourlyForecast {
-  HourlyForecastProperties? properties;
+  ForecastProperties? properties;
 
   HourlyForecast({this.properties});
 
   HourlyForecast.fromJson(Map<String, dynamic> json) {
     properties = json['properties'] != null
-        ? HourlyForecastProperties.fromJson(json['properties'])
+        ? ForecastProperties.fromJson(json['properties'])
         : null;
   }
 }
 
-class HourlyForecastProperties {
+/* class HourlyForecastProperties {
   String? updated;
   String? units;
   String? forecastGenerator;
@@ -244,7 +244,7 @@ class HourlyForecastProperties {
   String? updateTime;
   String? validTimes;
   Elevation? elevation;
-  List<HourlyPeriods>? periods;
+  List<Periods>? periods;
 
   HourlyForecastProperties(
       {this.updated,
@@ -266,15 +266,15 @@ class HourlyForecastProperties {
         ? Elevation.fromJson(json['elevation'])
         : null;
     if (json['periods'] != null) {
-      periods = <HourlyPeriods>[];
+      periods = <Periods>[];
       json['periods'].forEach((v) {
-        periods!.add(HourlyPeriods.fromJson(v));
+        periods!.add(Periods.fromJson(v));
       });
     }
   }
-}
+} */
 
-class HourlyPeriods {
+/* class HourlyPeriods {
   int? number;
   String? name;
   String? startTime;
@@ -331,7 +331,7 @@ class HourlyPeriods {
     shortForecast = json['shortForecast'];
     detailedForecast = json['detailedForecast'];
   }
-}
+} */
 
 //Geocoding: Coordinates from zip code
 

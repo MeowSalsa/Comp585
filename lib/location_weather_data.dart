@@ -7,7 +7,7 @@ class LocationWeatherData {
   WeatherPoint? weatherPointData;
   Forecast? forecast;
   HourlyForecast? hourlyForecast;
-  HourlyPeriods? nowForecast;
+  Periods? nowForecast;
   double? lat;
   double? long;
   Location? location;

@@ -35,7 +35,7 @@ class DataManager {
     }
   }
 
-  Future<HourlyPeriods> _getNowForecast(String locationString) async {
+  Future<Periods> _getNowForecast(String locationString) async {
     HourlyForecast hourlyForecast = await _getHourlyForecast(locationString);
     var nowForecast = hourlyForecast.properties?.periods?[0];
     print(nowForecast);
@@ -201,7 +201,7 @@ class DataManager {
     return favoritesList;
   }
 
-  HourlyPeriods getNowForecast(LocationWeatherData currentLocation) {
+  Periods getNowForecast(LocationWeatherData currentLocation) {
     return currentLocation.nowForecast!;
   }
 }
