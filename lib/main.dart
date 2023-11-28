@@ -5,6 +5,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:weather_app/daily_weather.dart';
 
 // void main() {
 //   runApp(const MyApp());
@@ -131,7 +132,10 @@ class MyApp extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DetailScreen(city: _controller.text),
+                    //push to CurrentWeatherDisplay
+                    //in the parameters put --> (locationString:)
+                    builder: (context) =>
+                        CurrentWeatherDisplay(locationString: _controller.text),
                   ),
                 );
               },
@@ -202,9 +206,12 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
     if (favoriteLocations.isNotEmpty) {
       return GridView.count(
         crossAxisCount: 2,
+        crossAxisSpacing: 50.0, // Horizontal spacing between grid items
+        mainAxisSpacing: 50.0, // Vertical spacing between grid items
+        childAspectRatio: 1.0, // Aspect ratio for items in the grid
         children: favoriteLocations
-            .map((favoriteLocations) =>
-                _buildWeatherBoxWithLocationObject(context, favoriteLocations))
+            .map((location) =>
+                _buildWeatherBoxWithLocationObject(context, location))
             .toList(),
       );
     } else {
@@ -248,11 +255,21 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
           );
         },
         child: Container(
-          width: 150.0,
-          height: 150.0,
+          // width: 150.0,
+          // height: 150.0,
           decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.3),
+            //color: Colors.white.withOpacity(0.3),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(15.0),
+            boxShadow: [
+              // Just trying this out, Optional: Adds a shadow to lift the card visually
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 4,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+            ],
           ),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -305,48 +322,48 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
 //   );
 // }
 
-Widget _buildWeatherBox(BuildContext context, String city, String temperature,
-    String weather, IconData icon, Color iconColor) {
-  // This widget builds each individual weather box with the city, temperature, and weather condition.
-  return Material(
-    color: Colors.transparent,
-    child: InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DetailScreen(city: city),
-          ),
-        );
-      },
-      child: Container(
-        width: 150.0,
-        height: 150.0,
-        decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(city,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 14)),
-              const SizedBox(height: 5),
-              Icon(icon, size: 40, color: iconColor),
-              const SizedBox(height: 5),
-              Text(temperature,
-                  style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 5),
-              Text(weather, style: const TextStyle(fontSize: 12)),
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
-}
+// Widget _buildWeatherBox(BuildContext context, String city, String temperature,
+//     String weather, IconData icon, Color iconColor) {
+//   // This widget builds each individual weather box with the city, temperature, and weather condition.
+//   return Material(
+//     color: Colors.transparent,
+//     child: InkWell(
+//       onTap: () {
+//         Navigator.push(
+//           context,
+//           MaterialPageRoute(
+//             builder: (context) => DetailScreen(city: city),
+//           ),
+//         );
+//       },
+//       child: Container(
+//         width: 150.0,
+//         height: 150.0,
+//         decoration: BoxDecoration(
+//           color: Colors.grey.withOpacity(0.3),
+//           borderRadius: BorderRadius.circular(15.0),
+//         ),
+//         child: Padding(
+//           padding: const EdgeInsets.all(8.0),
+//           child: Column(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               Text(city,
+//                   style: const TextStyle(
+//                       fontWeight: FontWeight.bold, fontSize: 14)),
+//               const SizedBox(height: 5),
+//               Icon(icon, size: 40, color: iconColor),
+//               const SizedBox(height: 5),
+//               Text(temperature,
+//                   style: const TextStyle(
+//                       fontSize: 24, fontWeight: FontWeight.bold)),
+//               const SizedBox(height: 5),
+//               Text(weather, style: const TextStyle(fontSize: 12)),
+//             ],
+//           ),
+//         ),
+//       ),
+//     ),
+//   );
+// }
