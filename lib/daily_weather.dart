@@ -134,7 +134,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                     WindDisplay(windSpeed: weatherData.currentWindSpeed, windDirection: weatherData.currentWindDirection,),
                                     PrecipitationDisplay(precipitationChance: weatherData.currentPrecipitationChance,),
                                     HumidityDisplay(humidityPercent: weatherData.currentHumidity,),
-                                    DewPointDisplay(dewPoint: weatherData.currentHumidity,),
+                                    DewPointDisplay(dewPoint: weatherData.currentDewPoint,),
                                   ],
                                 ),
 
@@ -192,6 +192,7 @@ class WeatherData {
     HourlyPeriods currentPeriod = forecast.properties!.periods![0];
     ProbabilityOfPrecipitation? precipitation = currentPeriod.probabilityOfPrecipitation;
     ProbabilityOfPrecipitation? humidity = currentPeriod.relativeHumidity;
+    Elevation? dewPoint = currentPeriod.dewpoint;
 
     currentCity = weatherLocation.displayableString;
     currentTemp = currentPeriod.temperature;
@@ -201,31 +202,38 @@ class WeatherData {
     currentWindSpeed = currentPeriod.windSpeed;
     currentWindDirection = currentPeriod.windDirection;
 
-    currentPrecipitationChance = formatPrecipitation(precipitation);
-    
-    currentHumidity = formatPrecipitation(humidity);
+    currentPrecipitationChance = formatUnitValueString(precipitation!.value, precipitation.unitCode);
+    currentHumidity = formatUnitValueString(humidity!.value, humidity.unitCode);
+
+    // Dew Point is in Celsius
+    double dewPointValue = (dewPoint!.value!.toDouble() * 9.0) / 5.0 + 32.0;
+    currentDewPoint = formatUnitValueString(dewPointValue.toInt(), "\u00B0F");
 
     locationLongitude = weatherLocation.long!;
 
     isFirstTimeLoad = false;
   }
 
-  String? formatPrecipitation(ProbabilityOfPrecipitation? p)
+  String? formatUnitValueString(int? value, String? unitCode)
   {
     String? displayString = "";
 
-    if (p!.value == null)
+    if (value == null)
     {
       displayString += "0";
     }
     else
     {
-      displayString += "${p.value}";
+      displayString += "$value";
     }
-
-    if (p.unitCode!.contains("percent"))
+    
+    if (unitCode!.contains("percent"))
     {
       displayString += "%";
+    }
+    else
+    {
+      displayString += unitCode;
     }
 
     return displayString;

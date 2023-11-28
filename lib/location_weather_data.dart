@@ -82,13 +82,14 @@ class LocationWeatherData {
       } else if (component.types?[0] == "neighborhood") {
         displayableString ??= component.longName;
       } else if (component.types?[0] == "locality") {
-        if (displayableString == null) {
-          displayableString = component.longName;
-        } else {
-          displayableString = "${displayableString!}, ${component.longName!}";
-        }
+        //if (displayableString == null) {
+          displayableString ??= component.longName;
+        //} 
+        // else {
+        //   displayableString = "${displayableString!}, ${component.longName!}";
+        // }
       } else if (component.types?[0] == "administrative_area_level_1") {
-        displayableString = "${displayableString!}, ${component.longName!}";
+        displayableString = "${displayableString!}, ${component.shortName!}";
       }
     }
   }
