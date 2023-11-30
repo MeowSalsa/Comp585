@@ -185,11 +185,14 @@ class DataManager {
 
   /// Adds a LocationWeatherData object to the _FavoriteLocations hashmap, and asynchronously
   /// writes the new location to the favorite locations JSON file.
-  void addToFavorites(LocationWeatherData dataObj) async {
+  Future<void> addToFavorites(LocationWeatherData dataObj) async {
     _favoriteLocations[dataObj.searchInput!] = dataObj;
     String data = "";
     data = json.encode(_favoriteLocations);
     await _saveFavoritesData(data);
+    if (dataObj.hourlyForecast == null) {
+      await _getHourlyForecast(dataObj.searchInput!);
+    }
   }
 
   /// Turns the _favoriteLocations hashmap into a list<LocationWeatherData> then returns it.
