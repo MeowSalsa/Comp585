@@ -7,17 +7,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_app/daily_weather.dart';
 
-// void main() {
-//   runApp(const MyApp());
-// }
-
-// Mock function to simulate fetching weather details for a city
-// Future<String> fetchWeatherDetails(String city) async {
-// In reality, you'd make an API call here and get the details for the city.
-//   await Future.delayed(const Duration(seconds: 1)); // Simulating network delay
-//   return "Weather details for $city"; // Placeholder text
-// }
-
 import 'package:weather_app/tests.dart';
 
 import 'package:weather_app/data_manager.dart';
@@ -241,7 +230,8 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
         getIconForCondition(dataManager.getNowForecast(location).shortForecast);
     Color iconColor = getColorForTemperature(
         dataManager.getNowForecast(location).temperature);
-
+    print(
+        "${location.displayableString} last updated at ${location.hourlyForecastTimeStamp}");
     // This widget builds each individual weather box with the city, temperature, and weather condition.
     return Material(
       color: Colors.transparent,
@@ -298,74 +288,3 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
     );
   }
 }
-//---------------------------------------------------
-//uncomment this to go back how i had it - A.C.
-//--------------------------------------------------
-//     children: <Widget>[
-//       _buildWeatherBox(context, 'Los Angeles, CA', '76°', 'Sunny',
-//           FontAwesomeIcons.sun, Colors.yellow),
-//       _buildWeatherBox(context, 'New York, NY', '63°', 'Mostly Sunny',a
-//           Icons.wb_sunny, Colors.yellow),
-//       _buildWeatherBox(context, 'Las Vegas, NV', '90°', 'Sunny',
-//           FontAwesomeIcons.sunPlantWilt, Colors.yellow),
-//       _buildWeatherBox(context, 'Boston, MA', '63°', 'Isolated Rain Showers',
-//           FontAwesomeIcons.cloudRain, Colors.blue),
-//       _buildWeatherBox(
-//           context,
-//           'Miami, FL',
-//           '87°',
-//           'Chance Showers And Thunderstorms',
-//           / ignore: deprecated_member_use
-//           FontAwesomeIcons.thunderstorm,
-//           Colors.red),
-//       _buildWeatherBox(context, 'Austin, TX', '81°',
-//           'Slight Chance Rain Showers', Icons.cloud, Colors.grey),
-//     ],
-//   );
-// }
-
-// Widget _buildWeatherBox(BuildContext context, String city, String temperature,
-//     String weather, IconData icon, Color iconColor) {
-//   // This widget builds each individual weather box with the city, temperature, and weather condition.
-//   return Material(
-//     color: Colors.transparent,
-//     child: InkWell(
-//       onTap: () {
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(
-//             builder: (context) => DetailScreen(city: city),
-//           ),
-//         );
-//       },
-//       child: Container(
-//         width: 150.0,
-//         height: 150.0,
-//         decoration: BoxDecoration(
-//           color: Colors.grey.withOpacity(0.3),
-//           borderRadius: BorderRadius.circular(15.0),
-//         ),
-//         child: Padding(
-//           padding: const EdgeInsets.all(8.0),
-//           child: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             mainAxisSize: MainAxisSize.min,
-//             children: [
-//               Text(city,
-//                   style: const TextStyle(
-//                       fontWeight: FontWeight.bold, fontSize: 14)),
-//               const SizedBox(height: 5),
-//               Icon(icon, size: 40, color: iconColor),
-//               const SizedBox(height: 5),
-//               Text(temperature,
-//                   style: const TextStyle(
-//                       fontSize: 24, fontWeight: FontWeight.bold)),
-//               const SizedBox(height: 5),
-//               Text(weather, style: const TextStyle(fontSize: 12)),
-//             ],
-//           ),
-//         ),
-//       ),
-//     ),
-//   );
-// }
