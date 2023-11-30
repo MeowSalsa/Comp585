@@ -250,7 +250,9 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => DetailScreen(city: city),
+              builder: (context) => CurrentWeatherDisplay(
+                  locationString:
+                      location.searchInput ?? "something went wrong"),
             ),
           );
         },
