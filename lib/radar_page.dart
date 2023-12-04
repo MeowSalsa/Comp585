@@ -40,7 +40,7 @@ class _RadarPageState extends State<Radar> {
                   placeholder: (context, url) => const CircularProgressIndicator(),
                   errorWidget: (context, url, error) =>const Icon(Icons.error),
                   width: constraints.maxWidth *
-                      0.5, // Use the maximum width available
+                      0.5,
                   height: imageSize,
                   fit: BoxFit.cover,
                 ),
