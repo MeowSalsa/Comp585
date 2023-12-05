@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import 'api_manager.dart';
 import 'local_time.dart';
@@ -20,7 +19,7 @@ class MajorWeatherDisplay extends StatelessWidget {
     required this.longitude,
   });
 
-  static Widget getConditionIcon(String condition, double iconSize, double? longitude) {
+  static Widget getConditionIcon(String condition, double iconSize, DateTime time, double? longitude) {
     
     Widget sun = Padding(
       padding: EdgeInsets.all(iconSize / 4.0),
@@ -123,7 +122,7 @@ class MajorWeatherDisplay extends StatelessWidget {
 
     switch(condition) {
       case String s when (s.contains("Partly") || s.contains("Mostly")):
-        double dayPercent = LocalTime.getLocalDayPercent(longitude);
+        double dayPercent = LocalTime.getDayPercent(time);
         if (dayPercent > 0.25 && dayPercent < 0.75)
         {
           return partlySun;
@@ -163,7 +162,7 @@ class MajorWeatherDisplay extends StatelessWidget {
       children: [
         // Condition icon
         Container(
-          child: getConditionIcon(conditionLabel, screenHeight / 3.8, longitude),
+          child: getConditionIcon(conditionLabel, screenHeight / 3.8, DateTime.now(), longitude),
         ),
 
         // Temperature
@@ -492,6 +491,7 @@ class MiniWeatherDisplay extends StatelessWidget {
   final String? conditionString;
   final Widget? bottomLabel;
   final double iconSize;
+  final DateTime time;
   final double? longitude;
 
 
@@ -501,6 +501,7 @@ class MiniWeatherDisplay extends StatelessWidget {
     required this.conditionString,
     required this.bottomLabel,
     required this.iconSize,
+    required this.time,
     required this.longitude
   });
 
@@ -510,7 +511,7 @@ class MiniWeatherDisplay extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         topLabel ?? const Spacer(),
-        MajorWeatherDisplay.getConditionIcon(conditionString!, iconSize, longitude),
+        MajorWeatherDisplay.getConditionIcon(conditionString!, iconSize, time, longitude),
         bottomLabel ?? const Spacer(),
       ],
     );
@@ -564,11 +565,8 @@ class HourlyWeatherDisplay extends StatelessWidget {
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       shrinkWrap: true,
+                      itemCount: 24,
                       itemBuilder:(context, index) {
-                        if (index >= 24)
-                        {
-                          return null;
-                        }
 
                         DateTime currentTime = LocalTime.toLocalTime(DateTime.parse(hourlyForecasts![index].startTime!), longitude);
 
@@ -602,6 +600,7 @@ class HourlyWeatherDisplay extends StatelessWidget {
                               ),
                             ),
                             conditionString: hourlyForecasts![index].shortForecast,
+                            time: currentTime,
                             iconSize: screenHeight / 20.0,
                             longitude: longitude
                           ),
