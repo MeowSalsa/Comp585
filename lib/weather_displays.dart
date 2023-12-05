@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import 'api_manager.dart';
 import 'local_time.dart';
@@ -19,10 +20,10 @@ class MajorWeatherDisplay extends StatelessWidget {
     required this.longitude,
   });
 
-  Widget getConditionIcon(String condition, double iconSize) {
+  static Widget getConditionIcon(String condition, double iconSize, double? longitude) {
     
     Widget sun = Padding(
-      padding: EdgeInsets.only(top: iconSize / 4.0, bottom: iconSize / 4.0),
+      padding: EdgeInsets.all(iconSize / 4.0),
       child: Icon(
         WeatherIcons.sun,
         color: const Color(0xFFFFF386),
@@ -31,7 +32,7 @@ class MajorWeatherDisplay extends StatelessWidget {
     );
 
     Widget moon = Padding(
-      padding: EdgeInsets.only(top: iconSize / 2.9, bottom: iconSize / 2.9),
+      padding: EdgeInsets.all(iconSize / 2.9),
       child: Icon(
         WeatherIcons.moon,
         color: Colors.white,
@@ -40,7 +41,7 @@ class MajorWeatherDisplay extends StatelessWidget {
     );
 
     Widget partlySun = Padding(
-      padding: EdgeInsets.only(bottom: iconSize / 20.0),
+      padding: EdgeInsets.symmetric(vertical: iconSize / 20.0),
       child: Stack(
         children: [
           Icon(
@@ -58,7 +59,7 @@ class MajorWeatherDisplay extends StatelessWidget {
     );
 
     Widget partlyMoon = Padding(
-      padding: EdgeInsets.only(bottom: iconSize / 20.0),
+      padding: EdgeInsets.symmetric(vertical: iconSize / 20.0),
       child: Stack(
         children: [
           Icon(
@@ -162,7 +163,7 @@ class MajorWeatherDisplay extends StatelessWidget {
       children: [
         // Condition icon
         Container(
-          child: getConditionIcon(conditionLabel, screenHeight / 3.8),
+          child: getConditionIcon(conditionLabel, screenHeight / 3.8, longitude),
         ),
 
         // Temperature
@@ -485,17 +486,51 @@ class DewPointDisplay extends StatelessWidget {
   }
 }
 
-class HourlyWeatherDisplay extends StatelessWidget {
+class MiniWeatherDisplay extends StatelessWidget {
 
-  final List<HourlyPeriods>? hourlyForecasts;
+  final Widget? topLabel;
+  final String? conditionString;
+  final Widget? bottomLabel;
+  final double iconSize;
+  final double? longitude;
 
-  const HourlyWeatherDisplay({
+
+  const MiniWeatherDisplay({
     super.key,
-    required this.hourlyForecasts,
+    required this.topLabel,
+    required this.conditionString,
+    required this.bottomLabel,
+    required this.iconSize,
+    required this.longitude
   });
 
   @override
   Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        topLabel ?? const Spacer(),
+        MajorWeatherDisplay.getConditionIcon(conditionString!, iconSize, longitude),
+        bottomLabel ?? const Spacer(),
+      ],
+    );
+  }
+}
+
+class HourlyWeatherDisplay extends StatelessWidget {
+
+  final List<HourlyPeriods>? hourlyForecasts;
+  final double? longitude;
+
+  const HourlyWeatherDisplay({
+    super.key,
+    required this.hourlyForecasts,
+    required this.longitude,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Padding(
@@ -518,10 +553,63 @@ class HourlyWeatherDisplay extends StatelessWidget {
 
           SizedBox(
             height: screenHeight / 7.2,
+            width: screenWidth,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(screenHeight / 32.0),
-              child: Container(
+              child: (hourlyForecasts == null) ? null : Container(
                 color: const Color(0x80E7E7E7),
+                child: Padding(
+                  padding: EdgeInsets.only(left: screenWidth / 36.0, right: screenWidth / 72.0),
+                  child: Center(
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      itemBuilder:(context, index) {
+                        if (index >= 24)
+                        {
+                          return null;
+                        }
+
+                        DateTime currentTime = LocalTime.toLocalTime(DateTime.parse(hourlyForecasts![index].startTime!), longitude);
+
+                        int currentHour = currentTime.hour;
+                        String ampm = "AM";
+                        if (currentHour > 12)
+                        {
+                          currentHour -= 12;
+                          ampm = "PM";
+                        }
+                        if (currentHour == 0)
+                        {
+                          currentHour = 12;
+                        }
+
+                        return Padding(
+                          padding: EdgeInsets.symmetric(horizontal: screenWidth / 72.0),
+                          child: MiniWeatherDisplay(
+                            topLabel: Text(
+                              "$currentHour$ampm",
+                              style: TextStyle(
+                                fontSize: screenHeight / 53.3,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            bottomLabel: Text(
+                              "${hourlyForecasts![index].temperature}\u00B0${hourlyForecasts![index].temperatureUnit}",
+                              style: TextStyle(
+                                fontSize: screenHeight / 64.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            conditionString: hourlyForecasts![index].shortForecast,
+                            iconSize: screenHeight / 20.0,
+                            longitude: longitude
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

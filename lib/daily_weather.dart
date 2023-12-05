@@ -129,7 +129,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                         
                                         Container(
                                           color: colorScheme.mainBGColor,
-                                          child: HourlyWeatherDisplay(hourlyForecasts: weatherData.futurePeriods),
+                                          child: HourlyWeatherDisplay(hourlyForecasts: weatherData.futurePeriods, longitude: weatherData.locationLongitude),
                                         ),
                                       ],
                                     ),

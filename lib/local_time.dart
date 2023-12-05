@@ -6,10 +6,21 @@ class LocalTime {
       return getDayPercent(DateTime.now());
     }
 
+    DateTime localTime = toLocalTime(DateTime.now(), longitude);
+    
+    return getDayPercent(localTime);
+  }
+
+  static DateTime toLocalTime(DateTime time, double? longitude)
+  {
+    if (longitude == null)
+    {
+      return time;
+    }
+
     int timeOffset = longitude ~/ 0.004167;
 
-    DateTime localTime = DateTime.now().toUtc().add(Duration(seconds: timeOffset));
-    return getDayPercent(localTime);
+    return time.toUtc().add(Duration(seconds: timeOffset));
   }
 
   static double getDayPercent(DateTime time)
