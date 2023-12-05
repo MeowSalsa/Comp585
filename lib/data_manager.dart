@@ -118,7 +118,7 @@ class DataManager {
     }
     LocationWeatherData newLocation =
         LocationWeatherData.defaultConstructor(stringInput);
-    await initializeLocation();
+    await initializeLocation(newLocation);
     _recentSearches[stringInput] = newLocation;
     return newLocation;
   }
@@ -159,7 +159,7 @@ class DataManager {
       //have to iterate through lists to find the proper data the below stuff
       locationData.location =
           locationCoordinateData.results?[0].geometry?.location as Location;
-      createDisplayableString(locationCoordinateData);
+      createDisplayableString(locationCoordinateData, locationData);
       locationData.lat = locationData.location?.latitude;
       locationData.long = locationData.location?.longitude;
       //init weatherpoint
@@ -170,21 +170,24 @@ class DataManager {
     }
   }
 
-  void createDisplayableString(CoordinatesFromLocation locationData) {
-    var addressComponents = locationData.results?[0].addressComponents;
+  void createDisplayableString(CoordinatesFromLocation coordinateData,
+      LocationWeatherData locationData) {
+    var addressComponents = coordinateData.results?[0].addressComponents;
     for (var component in addressComponents!) {
       if (component.types?[0] == "postal_code") {
-        zip = component.types?[0];
+        locationData.zip = component.types?[0];
       } else if (component.types?[0] == "neighborhood") {
-        displayableString ??= component.longName;
+        locationData.displayableString ??= component.longName;
       } else if (component.types?[0] == "locality") {
-        if (displayableString == null) {
-          displayableString = component.longName;
+        if (locationData.displayableString == null) {
+          locationData.displayableString = component.longName;
         } else {
-          displayableString = "${displayableString!}, ${component.longName!}";
+          locationData.displayableString =
+              "${locationData.displayableString!}, ${component.longName!}";
         }
       } else if (component.types?[0] == "administrative_area_level_1") {
-        displayableString = "${displayableString!}, ${component.longName!}";
+        locationData.displayableString =
+            "${locationData.displayableString!}, ${component.longName!}";
       }
     }
   }
@@ -271,6 +274,8 @@ class DataManager {
     return favoritesList;
   }
 
+//Function to get the forecast at the current time for the main menu. Done synchronously because
+//The favorites data shouldve been initialized previously.
   HourlyPeriods getNowForecast(LocationWeatherData currentLocation) {
     return currentLocation.nowForecast!;
   }
