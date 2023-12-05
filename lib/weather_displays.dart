@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'api_manager.dart';
 import 'local_time.dart';
 import 'weather_icons.dart';
 
@@ -39,7 +40,7 @@ class MajorWeatherDisplay extends StatelessWidget {
     );
 
     Widget partlySun = Padding(
-      padding: EdgeInsets.all(iconSize / 20.0),
+      padding: EdgeInsets.only(bottom: iconSize / 20.0),
       child: Stack(
         children: [
           Icon(
@@ -57,7 +58,7 @@ class MajorWeatherDisplay extends StatelessWidget {
     );
 
     Widget partlyMoon = Padding(
-      padding: EdgeInsets.all(iconSize / 20.0),
+      padding: EdgeInsets.only(bottom: iconSize / 20.0),
       child: Stack(
         children: [
           Icon(
@@ -155,20 +156,20 @@ class MajorWeatherDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
 
     return Column(
       children: [
         // Condition icon
         Container(
-          child: getConditionIcon(conditionLabel, screenWidth / 2.2),
+          child: getConditionIcon(conditionLabel, screenHeight / 3.8),
         ),
 
         // Temperature
         Text(
           temperatureLabel,
           style: TextStyle(
-            fontSize: screenWidth / 7.5,
+            fontSize: screenHeight / 13.3,
           ),
         ),
 
@@ -176,7 +177,7 @@ class MajorWeatherDisplay extends StatelessWidget {
         Text(
           conditionLabel,
           style: TextStyle(
-            fontSize: screenWidth / 22.5,
+            fontSize: screenHeight / 40,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -203,7 +204,7 @@ class MinorWeatherDisplay extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.all(screenWidth / 24.0),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: BorderRadius.circular(screenWidth / 18.0),
         child: Container(
           padding: EdgeInsets.all(screenWidth / 24.0),
           color: const Color(0x80E7E7E7),
@@ -324,12 +325,10 @@ class WindDisplay extends StatelessWidget {
             SizedBox(
               width: compassSize,
               height: compassSize,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(screenWidth / 6.8),
-                  color: Colors.transparent,
-                  border: Border.all(width: 5, color: Colors.white),
-                ),
+              child: Icon(
+                Icons.brightness_1_outlined,
+                color: Colors.white,
+                size: compassSize,
               ),
             ),
 
@@ -339,15 +338,10 @@ class WindDisplay extends StatelessWidget {
                 width: compassSize,
                 height: compassSize,
                 child: Center(
-                  child: SizedBox(
-                    width: 10,
-                    height: compassSize,
-                    child: const DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.only(topLeft: Radius.elliptical(5, 10), topRight: Radius.elliptical(5, 10)),
-                      ),
-                    ),
+                  child: Icon(
+                    Icons.north,
+                    color: Colors.red,
+                    size: compassSize,
                   ),
                 ),
               ),
@@ -406,7 +400,7 @@ class PrecipitationDisplay extends StatelessWidget {
             color: Colors.white,
             size: screenWidth * (3.0 / 20.0),
           ),
-          Padding(padding: EdgeInsets.only(top: screenWidth / 24.0)),
+          Padding(padding: EdgeInsets.only(top: screenWidth / 28.0)),
           Text(
             "$precipitationChance",
             style: TextStyle(
@@ -442,7 +436,7 @@ class HumidityDisplay extends StatelessWidget {
             color: Colors.white,
             size: screenWidth * (3.0 / 20.0),
           ),
-          Padding(padding: EdgeInsets.only(top: screenWidth / 24.0)),
+          Padding(padding: EdgeInsets.only(top: screenWidth / 28.0)),
           Text(
             "$humidityPercent",
             style: TextStyle(
@@ -478,11 +472,57 @@ class DewPointDisplay extends StatelessWidget {
             color: Colors.white,
             size: screenWidth * (3.0 / 20.0),
           ),
-          Padding(padding: EdgeInsets.only(top: screenWidth / 24.0)),
+          Padding(padding: EdgeInsets.only(top: screenWidth / 28.0)),
           Text(
             "$dewPoint",
             style: TextStyle(
               fontSize: screenWidth / 22.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class HourlyWeatherDisplay extends StatelessWidget {
+
+  final List<HourlyPeriods>? hourlyForecasts;
+
+  const HourlyWeatherDisplay({
+    super.key,
+    required this.hourlyForecasts,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(screenHeight / 42.6, screenHeight / 68, screenHeight / 42.6, screenHeight / 42.6),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "Hourly Weather",
+                style: TextStyle(
+                  fontSize: screenHeight / 35.6,
+                ),
+              ),
+            ],
+          ),
+
+          Padding(padding: EdgeInsets.only(top: screenHeight / 64.0)),
+
+          SizedBox(
+            height: screenHeight / 7.2,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(screenHeight / 32.0),
+              child: Container(
+                color: const Color(0x80E7E7E7),
+              ),
             ),
           ),
         ],

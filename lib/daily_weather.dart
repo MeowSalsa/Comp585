@@ -20,7 +20,9 @@ class CurrentWeatherDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     
     double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     weatherData.locationString = locationString;
+    double bottomBarHeight = screenWidth / 10.0;
 
     return FutureBuilder(
       future: weatherData.getCurrentWeather(),
@@ -41,114 +43,170 @@ class CurrentWeatherDisplay extends StatelessWidget {
           data: Theme.of(context).copyWith(textTheme: textTheme),
           child: Scaffold(
             
-            body: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    colorScheme.skyStartColor,
-                    colorScheme.skyEndColor,
-                  ],
-                  begin: Alignment.topCenter,
-                  end: const Alignment(0.0, 0.75),
-                  stops: const [0.0, 1.0],
-                  tileMode: TileMode.clamp
-                ),
-              ),
-              child: Center(
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
+            body: Stack(
+              children:[
+                Container(
+                      width: screenWidth,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            colorScheme.skyStartColor,
+                            colorScheme.skyEndColor,
+                            colorScheme.skyEndColor,
+                            colorScheme.mainBGColor,
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          stops: const [0.0, 0.75, 0.76, 0.77],
+                          tileMode: TileMode.clamp
+                        ),
+                      ),
+                      child: Center(
+                        child: ListView(
+                          shrinkWrap: true,
+                          children: [
 
-                    // Location label
-                    Padding(
-                      padding: EdgeInsets.only(left: screenWidth / 28.0, top: screenWidth / 24.0),
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
 
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
+                                  SizedBox(
+                                    width: screenWidth,
+                                    height: screenHeight - bottomBarHeight,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(left: screenHeight / 50.0, top: screenHeight / 75.0),
 
-                          Flexible(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              clipBehavior: Clip.hardEdge,
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                },
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: [
 
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.arrow_back_ios_new_rounded,
-                                      color: Colors.white,
-                                      size: screenWidth / 18.0,
+                                              Flexible(
+                                                child: FittedBox(
+                                                  fit: BoxFit.scaleDown,
+                                                  clipBehavior: Clip.hardEdge,
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.pop(context);
+                                                    },
+
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.arrow_back_ios_new_rounded,
+                                                          color: Colors.white,
+                                                          size: screenHeight / 32.0,
+                                                        ),
+
+                                                        Padding(padding: EdgeInsets.only(left: screenHeight / 53.0)),
+
+                                                        Text(
+                                                          "${weatherData.currentCity}",
+                                                          maxLines: 1,
+                                                          style: TextStyle(
+                                                            fontSize: screenHeight / 35.0,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                        // MAJOR WEATHER DISPLAY
+                                        MajorWeatherDisplay(
+                                          temperatureLabel: "${weatherData.currentTemp}\u00B0${weatherData.currentUnits}", 
+                                          longitude: weatherData.locationLongitude,
+                                          conditionLabel: "${weatherData.currentCond}",
+                                        ),
+                                        
+                                        Container(
+                                          color: colorScheme.mainBGColor,
+                                          child: HourlyWeatherDisplay(hourlyForecasts: weatherData.futurePeriods),
+                                        ),
+                                      ],
                                     ),
+                                  ),
 
-                                    Padding(padding: EdgeInsets.only(left: screenWidth / 72.0)),
+                                  // MINOR WEATHER DISPLAYS
+                                  SizedBox(
+                                    width: screenWidth,
+                                    child: Container(
+                                      color: colorScheme.mainBGColor,
+                                      child: Column(
+                                        children: [
 
-                                    Text(
-                                      "${weatherData.currentCity}",
-                                      maxLines: 1,
-                                      style: TextStyle(
-                                        fontSize: screenWidth / 20.0,
-                                        fontWeight: FontWeight.bold,
+                                          GridView(
+                                            shrinkWrap: true,
+                                            physics: const NeverScrollableScrollPhysics(),
+                                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: 1, crossAxisCount: 2),
+
+                                            children: [
+                                              WindDisplay(windSpeed: weatherData.currentWindSpeed, windDirection: weatherData.currentWindDirection,),
+                                              PrecipitationDisplay(precipitationChance: weatherData.currentPrecipitationChance,),
+                                              HumidityDisplay(humidityPercent: weatherData.currentHumidity,),
+                                              DewPointDisplay(dewPoint: weatherData.currentDewPoint,),
+                                            ],
+                                          ),
+
+                                          // Placeholder for buttons
+                                          Padding(padding: EdgeInsets.only(top: bottomBarHeight)),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
 
-                          // MAJOR WEATHER DISPLAY
-                          MajorWeatherDisplay(
-                            temperatureLabel: "${weatherData.currentTemp}\u00B0${weatherData.currentUnits}", 
-                            longitude: weatherData.locationLongitude,
-                            conditionLabel: "${weatherData.currentCond}",
-                          ),
-
-                          Padding(padding: EdgeInsets.only(top: screenWidth * (3.0 / 8.0))),
-
-                          // MINOR WEATHER DISPLAYS
-                          Card(
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.zero,
+                // Location Quick Switch (Bottom Bar)
+                Positioned(
+                  bottom: 0,
+                  child: SizedBox(
+                    height: bottomBarHeight,
+                    width: screenWidth,
+                    child: Container(
+                      color: colorScheme.mainBGColor,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.search_rounded,
+                              color: Colors.white,
+                              size: screenWidth / 18.0,
                             ),
-                            color: colorScheme.mainBGColor,
-                            margin: EdgeInsets.zero,
-                            child: Column(
-                              children: [
-                                GridView(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: 1, crossAxisCount: 2),
-
-                                  children: [
-                                    WindDisplay(windSpeed: weatherData.currentWindSpeed, windDirection: weatherData.currentWindDirection,),
-                                    PrecipitationDisplay(precipitationChance: weatherData.currentPrecipitationChance,),
-                                    HumidityDisplay(humidityPercent: weatherData.currentHumidity,),
-                                    DewPointDisplay(dewPoint: weatherData.currentDewPoint,),
-                                  ],
-                                ),
-
-                                // Placeholder for buttons
-                                const Text("hello",),
-                              ],
+                            Icon(
+                              Icons.home,
+                              color: Colors.white,
+                              size: screenWidth / 18.0,
                             ),
-                          ),
-                        ],
+
+                            Text(
+                              "Bottom BAR",
+                              style: TextStyle(
+                                fontSize: screenWidth / 20.0,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         );
@@ -176,6 +234,7 @@ class WeatherData {
   String? currentDewPoint;
   String? time;
   double? locationLongitude;
+  List<HourlyPeriods>? futurePeriods;
 
   bool isFirstTimeLoad = true;
 
@@ -210,6 +269,8 @@ class WeatherData {
     currentDewPoint = formatUnitValueString(dewPointValue.toInt(), "\u00B0F");
 
     locationLongitude = weatherLocation.long!;
+
+    futurePeriods = forecast.properties!.periods!.sublist(1);
 
     isFirstTimeLoad = false;
   }
