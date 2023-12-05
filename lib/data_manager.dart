@@ -99,14 +99,14 @@ class DataManager {
   }
 
   Future<Forecast> _retrieveForecastFromObject(
-      LocationWeatherData location) async {
-    var forecast = await location.weatherPointToForecast();
+      LocationWeatherData locationData) async {
+    var forecast = await weatherPointToForecast(locationData);
     return forecast;
   }
 
   Future<HourlyForecast> _retrieveHourlyForecastFromObject(
-      LocationWeatherData location) async {
-    var hourlyForecast = await location.weatherPointToHourlyForecast();
+      LocationWeatherData locationData) async {
+    var hourlyForecast = await weatherPointToHourlyForecast(locationData);
     return hourlyForecast;
   }
 
@@ -118,11 +118,78 @@ class DataManager {
     }
     LocationWeatherData newLocation =
         LocationWeatherData.defaultConstructor(stringInput);
-    await newLocation.initializeLocation();
+    await initializeLocation();
     _recentSearches[stringInput] = newLocation;
     return newLocation;
   }
 
+  //API Call stuff below
+  Future<Forecast> weatherPointToForecast(
+      LocationWeatherData locationData) async {
+    if (locationData.forecast == null ||
+        (DateTime.now().difference(locationData.forecastTimeStamp!) >
+            const Duration(hours: 1))) {
+      locationData.forecast =
+          await APIManager().getForecast(locationData.weatherPointData!);
+      locationData.forecastTimeStamp = DateTime.now();
+    }
+    return locationData.forecast!;
+  }
+
+  Future<HourlyForecast> weatherPointToHourlyForecast(
+      LocationWeatherData locationData) async {
+    if (locationData.hourlyForecast == null ||
+        (DateTime.now().difference(locationData.hourlyForecastTimeStamp!) >
+            const Duration(hours: 1))) {
+      locationData.hourlyForecast =
+          await APIManager().getHourlyForecast(locationData.weatherPointData!);
+      locationData.hourlyForecastTimeStamp = DateTime.now();
+      locationData.nowForecast =
+          locationData.hourlyForecast?.properties?.periods?.first;
+    }
+    return locationData.hourlyForecast!;
+  }
+
+  Future<void> initializeLocation(LocationWeatherData locationData) async {
+    CoordinatesFromLocation? locationCoordinateData;
+    locationCoordinateData = await APIManager()
+        .getCoordinatesFromLocation(locationData.searchInput!);
+    //if locationData ! null, perform bottom. add an else
+    if (locationCoordinateData != null) {
+      //have to iterate through lists to find the proper data the below stuff
+      locationData.location =
+          locationCoordinateData.results?[0].geometry?.location as Location;
+      createDisplayableString(locationCoordinateData);
+      locationData.lat = locationData.location?.latitude;
+      locationData.long = locationData.location?.longitude;
+      //init weatherpoint
+      locationData.weatherPointData =
+          await APIManager().getWeatherPoint(locationData.location!);
+    } else {
+      print("Error at location initialization");
+    }
+  }
+
+  void createDisplayableString(CoordinatesFromLocation locationData) {
+    var addressComponents = locationData.results?[0].addressComponents;
+    for (var component in addressComponents!) {
+      if (component.types?[0] == "postal_code") {
+        zip = component.types?[0];
+      } else if (component.types?[0] == "neighborhood") {
+        displayableString ??= component.longName;
+      } else if (component.types?[0] == "locality") {
+        if (displayableString == null) {
+          displayableString = component.longName;
+        } else {
+          displayableString = "${displayableString!}, ${component.longName!}";
+        }
+      } else if (component.types?[0] == "administrative_area_level_1") {
+        displayableString = "${displayableString!}, ${component.longName!}";
+      }
+    }
+  }
+
+// File management stuff below
   Future<String> get _localPath async {
     var dir = await getApplicationDocumentsDirectory();
     return dir.path;
