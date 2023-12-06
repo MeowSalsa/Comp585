@@ -601,7 +601,7 @@ class HourlyWeatherDisplay extends StatelessWidget {
                             ),
                             conditionString: hourlyForecasts![index].shortForecast,
                             time: currentTime,
-                            iconSize: screenHeight / 20.0,
+                            iconSize: min(screenWidth / 7.2, screenHeight / 20.0),
                             longitude: longitude
                           ),
                         );
