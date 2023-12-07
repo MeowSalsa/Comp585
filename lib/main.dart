@@ -1,17 +1,13 @@
-// ignore_for_file: avoid_print
-
 import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_app/daily_weather.dart';
-
 import 'package:weather_app/tests.dart';
-
 import 'package:weather_app/data_manager.dart';
 import 'api_manager.dart';
 import 'location_weather_data.dart';
+import 'seven_day_forecast.dart';
 
 DataManager dataManager = DataManager();
 void main() async {
@@ -90,7 +86,7 @@ class _DetailScreenState extends State<DetailScreen> {
 class MyApp extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
 
-  MyApp({super.key}); // Step 1
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +102,7 @@ class MyApp extends StatelessWidget {
           title: Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: TextField(
-              controller: _controller, // set the controller for the TextField
+              controller: _controller,
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.grey[200],
@@ -121,8 +117,6 @@ class MyApp extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    //push to CurrentWeatherDisplay
-                    //in the parameters put --> (locationString:)
                     builder: (context) =>
                         CurrentWeatherDisplay(locationString: _controller.text),
                   ),
@@ -184,7 +178,6 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
         forecasts.add(forecast);
       } catch (e) {
         print('Error fetching forecast for ${favorite.searchInput}: $e');
-        // Handle the error or add a placeholder
       }
     }
     return forecasts;
@@ -240,12 +233,24 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => CurrentWeatherDisplay(
-                  locationString:
-                      location.searchInput ?? "something went wrong"),
+              builder: (context) => ForecastPage(
+                locationString: location.searchInput ?? "Unknown Location",
+              ),
             ),
           );
         },
+        // ---this sends you to the weather details of the clicked location------------------
+        // onTap: () {
+        //   Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //       builder: (context) => CurrentWeatherDisplay(
+        //           locationString:
+        //               location.searchInput ?? "something went wrong"),
+        //     ),
+        //   );
+        // },
+        //----------------------------------------------------------------------------------
         child: Container(
           // width: 150.0,
           // height: 150.0,
