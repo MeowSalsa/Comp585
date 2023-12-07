@@ -13,6 +13,8 @@ import 'package:weather_app/data_manager.dart';
 import 'api_manager.dart';
 import 'location_weather_data.dart';
 
+import 'daily_weather.dart';
+
 DataManager dataManager = DataManager();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -207,7 +209,6 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
       return const Text('No weather data available');
     }
   }
-
   IconData getIconForCondition(String? iconCode) {
     // Implement your own logic to map iconCode to IconData
     // This is just a placeholder

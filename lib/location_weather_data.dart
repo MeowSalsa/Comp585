@@ -34,5 +34,6 @@ class LocationWeatherData {
   LocationWeatherData(
       {required this.weatherPointData,
       required this.searchInput,
-      required this.displayableString});
+      required this.displayableString}
+  );
 }
