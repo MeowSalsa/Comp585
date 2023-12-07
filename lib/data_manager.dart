@@ -179,15 +179,10 @@ class DataManager {
       } else if (component.types?[0] == "neighborhood") {
         locationData.displayableString ??= component.longName;
       } else if (component.types?[0] == "locality") {
-        if (locationData.displayableString == null) {
           locationData.displayableString = component.longName;
-        } else {
-          locationData.displayableString =
-              "${locationData.displayableString!}, ${component.longName!}";
-        }
       } else if (component.types?[0] == "administrative_area_level_1") {
         locationData.displayableString =
-            "${locationData.displayableString!}, ${component.longName!}";
+            "${locationData.displayableString!}, ${component.shortName!}";
       }
     }
   }
