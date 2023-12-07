@@ -233,24 +233,12 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ForecastPage(
-                locationString: location.searchInput ?? "Unknown Location",
-              ),
+              builder: (context) => CurrentWeatherDisplay(
+                  locationString:
+                      location.searchInput ?? "something went wrong"),
             ),
           );
         },
-        // ---this sends you to the weather details of the clicked location------------------
-        // onTap: () {
-        //   Navigator.push(
-        //     context,
-        //     MaterialPageRoute(
-        //       builder: (context) => CurrentWeatherDisplay(
-        //           locationString:
-        //               location.searchInput ?? "something went wrong"),
-        //     ),
-        //   );
-        // },
-        //----------------------------------------------------------------------------------
         child: Container(
           // width: 150.0,
           // height: 150.0,
