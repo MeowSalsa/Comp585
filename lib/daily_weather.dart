@@ -181,30 +181,73 @@ class CurrentWeatherDisplay extends StatelessWidget {
                     width: screenWidth,
                     child: Container(
                       color: colorScheme.mainBGColor,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.search_rounded,
-                              color: Colors.white,
-                              size: screenWidth / 18.0,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: screenWidth / 8.0,
+                            color: colorScheme.mainBGColor,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.search_rounded,
+                                  color: Colors.white,
+                                  size: screenWidth / 18.0,
+                                ),
+                                Icon(
+                                  Icons.home,
+                                  color: Colors.white,
+                                  size: screenWidth / 18.0,
+                                ),
+                              ],
                             ),
-                            Icon(
-                              Icons.home,
-                              color: Colors.white,
-                              size: screenWidth / 18.0,
-                            ),
+                          ),
 
-                            Text(
-                              "Bottom BAR",
-                              style: TextStyle(
-                                fontSize: screenWidth / 20.0,
+                          SizedBox(
+                            height: bottomBarHeight,
+                            width: screenWidth * 7.0 / 8.0,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+
+                                  Text(
+                                    "Bottom BAR",
+                                    style: TextStyle(
+                                      fontSize: screenWidth / 20.0,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Bottom BAR",
+                                    style: TextStyle(
+                                      fontSize: screenWidth / 20.0,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Bottom BAR",
+                                    style: TextStyle(
+                                      fontSize: screenWidth / 20.0,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Bottom BAR",
+                                    style: TextStyle(
+                                      fontSize: screenWidth / 20.0,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Bottom BAR",
+                                    style: TextStyle(
+                                      fontSize: screenWidth / 20.0,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
