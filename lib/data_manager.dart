@@ -35,7 +35,7 @@ class DataManager {
     }
   }
 
-  Future<HourlyPeriods> _getNowForecast(String locationString) async {
+  Future<Periods> _getNowForecast(String locationString) async {
     HourlyForecast hourlyForecast = await _getHourlyForecast(locationString);
     var nowForecast = hourlyForecast.properties?.periods?[0];
     print(nowForecast);
@@ -179,7 +179,7 @@ class DataManager {
       } else if (component.types?[0] == "neighborhood") {
         locationData.displayableString ??= component.longName;
       } else if (component.types?[0] == "locality") {
-          locationData.displayableString = component.longName;
+        locationData.displayableString = component.longName;
       } else if (component.types?[0] == "administrative_area_level_1") {
         locationData.displayableString =
             "${locationData.displayableString!}, ${component.shortName!}";
@@ -269,9 +269,7 @@ class DataManager {
     return favoritesList;
   }
 
-//Function to get the forecast at the current time for the main menu. Done synchronously because
-//The favorites data shouldve been initialized previously.
-  HourlyPeriods getNowForecast(LocationWeatherData currentLocation) {
+  Periods getNowForecast(LocationWeatherData currentLocation) {
     return currentLocation.nowForecast!;
   }
 }

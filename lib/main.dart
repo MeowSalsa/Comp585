@@ -157,7 +157,7 @@ class CurvedSquareIcon extends StatefulWidget {
 }
 
 class _CurvedSquareIconState extends State<CurvedSquareIcon> {
-  late Future<List<HourlyPeriods>> weatherForecasts;
+  late Future<List<Periods>> weatherForecasts;
   late List<LocationWeatherData> favoriteLocations;
 
   @override
@@ -168,14 +168,14 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
     print(favoriteLocations.length);
   }
 
-  Future<List<HourlyPeriods>> fetchWeatherForecasts() async {
+  Future<List<Periods>> fetchWeatherForecasts() async {
     await dataManager.loadFavorites(); // Load favorites from file
     List<LocationWeatherData> favorites = dataManager.getFavorites();
 
-    List<HourlyPeriods> forecasts = [];
+    List<Periods> forecasts = [];
     for (var favorite in favorites) {
       try {
-        HourlyPeriods forecast =
+        Periods forecast =
             await dataManager.getForecast(favorite, ForecastType.now);
         forecasts.add(forecast);
       } catch (e) {
@@ -202,6 +202,7 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
       return const Text('No weather data available');
     }
   }
+
   IconData getIconForCondition(String? iconCode) {
     // Implement your own logic to map iconCode to IconData
     // This is just a placeholder
