@@ -312,11 +312,10 @@ class WeatherData {
       return;
     }
 
-    DataManager newDM = DataManager();
     LocationWeatherData weatherLocation =
-        await newDM.searchForLocation(locationString!);
+        await DataManager.searchForLocation(locationString!);
     HourlyForecast forecast =
-        await newDM.getForecast(weatherLocation, ForecastType.hourly);
+        await DataManager.getForecast(weatherLocation, ForecastType.hourly);
     Periods currentPeriod = forecast.properties!.periods![0];
     ProbabilityOfPrecipitation? precipitation =
         currentPeriod.probabilityOfPrecipitation;

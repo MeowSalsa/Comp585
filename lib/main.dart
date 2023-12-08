@@ -2,30 +2,28 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:weather_app/daily_weather.dart';
-import 'package:weather_app/tests.dart';
-import 'package:weather_app/data_manager.dart';
+import 'daily_weather.dart';
+import 'data_manager.dart';
 import 'api_manager.dart';
 import 'location_weather_data.dart';
 import 'seven_day_forecast.dart';
 
 import 'daily_weather.dart';
 
-DataManager dataManager = DataManager();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Load favorites from file
-  await dataManager.loadFavorites();
-  /* var newLocation = await dataManager.searchForLocation("Eugene, Oregon");
-  await dataManager.addToFavorites(newLocation);
-  newLocation = await dataManager.searchForLocation("91331");
-  await dataManager.addToFavorites(newLocation);
-  newLocation = await dataManager.searchForLocation("Los Angeles, California");
-  await dataManager.addToFavorites(newLocation);
-  newLocation = await dataManager.searchForLocation("Houston, Texas");
-  await dataManager.addToFavorites(newLocation);
-  newLocation = await dataManager.searchForLocation("New York, New York");
-  await dataManager.addToFavorites(newLocation); */
+  await DataManager.loadFavorites();
+  /* var newLocation = await DataManager.searchForLocation("Eugene, Oregon");
+  await DataManager.addToFavorites(newLocation);
+  newLocation = await DataManager.searchForLocation("91331");
+  await DataManager.addToFavorites(newLocation);
+  newLocation = await DataManager.searchForLocation("Los Angeles, California");
+  await DataManager.addToFavorites(newLocation);
+  newLocation = await DataManager.searchForLocation("Houston, Texas");
+  await DataManager.addToFavorites(newLocation);
+  newLocation = await DataManager.searchForLocation("New York, New York");
+  await DataManager.addToFavorites(newLocation); */
   runApp(const RootApp());
 }
 
@@ -164,19 +162,19 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
   void initState() {
     super.initState();
     weatherForecasts = fetchWeatherForecasts();
-    favoriteLocations = dataManager.getFavorites();
+    favoriteLocations = DataManager.getFavorites();
     print(favoriteLocations.length);
   }
 
   Future<List<Periods>> fetchWeatherForecasts() async {
-    await dataManager.loadFavorites(); // Load favorites from file
-    List<LocationWeatherData> favorites = dataManager.getFavorites();
+    await DataManager.loadFavorites(); // Load favorites from file
+    List<LocationWeatherData> favorites = DataManager.getFavorites();
 
     List<Periods> forecasts = [];
     for (var favorite in favorites) {
       try {
         Periods forecast =
-            await dataManager.getForecast(favorite, ForecastType.now);
+            await DataManager.getForecast(favorite, ForecastType.now);
         forecasts.add(forecast);
       } catch (e) {
         print('Error fetching forecast for ${favorite.searchInput}: $e');
@@ -218,13 +216,13 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
   Widget _buildWeatherBoxWithLocationObject(
       BuildContext context, LocationWeatherData location) {
     var city = location.displayableString ?? 'Unknown Location';
-    var currentForecast = dataManager.getNowForecast(location);
+    var currentForecast = DataManager.getNowForecast(location);
     var temperature = '${currentForecast.temperature ?? 'N/A'}°';
     String weather = currentForecast.shortForecast ?? 'Unavailable';
     IconData icon =
-        getIconForCondition(dataManager.getNowForecast(location).shortForecast);
+        getIconForCondition(DataManager.getNowForecast(location).shortForecast);
     Color iconColor = getColorForTemperature(
-        dataManager.getNowForecast(location).temperature);
+        DataManager.getNowForecast(location).temperature);
     print(
         "${location.displayableString} last updated at ${location.hourlyForecastTimeStamp}");
     // This widget builds each individual weather box with the city, temperature, and weather condition.
