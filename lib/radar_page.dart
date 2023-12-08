@@ -21,8 +21,14 @@ class _RadarPageState extends State<Radar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Radar Page'),
-      ),
+          title: const Text('Radar Animation'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            color: Colors.white,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          )),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -37,10 +43,10 @@ class _RadarPageState extends State<Radar> {
                 ),
                 child: CachedNetworkImage(
                   imageUrl: imageUrl,
-                  placeholder: (context, url) => const CircularProgressIndicator(),
-                  errorWidget: (context, url, error) =>const Icon(Icons.error),
-                  width: constraints.maxWidth *
-                      0.5,
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                  width: constraints.maxWidth,
                   height: imageSize,
                   fit: BoxFit.cover,
                 ),
