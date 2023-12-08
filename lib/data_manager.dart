@@ -177,12 +177,14 @@ class DataManager {
       if (component.types?[0] == "postal_code") {
         locationData.zip = component.types?[0];
       } else if (component.types?[0] == "neighborhood") {
-        locationData.displayableString ??= component.longName;
+        locationData.displayableString = component.longName;
       } else if (component.types?[0] == "locality") {
-          locationData.displayableString = component.longName;
+          locationData.displayableString ??= component.longName;
       } else if (component.types?[0] == "administrative_area_level_1") {
-        locationData.displayableString =
-            "${locationData.displayableString!}, ${component.shortName!}";
+        locationData.displayableString = 
+          (!locationData.displayableString!.contains(component.shortName!)) 
+            ? "${locationData.displayableString!}, ${component.shortName!}" 
+            : locationData.displayableString;
       }
     }
   }
