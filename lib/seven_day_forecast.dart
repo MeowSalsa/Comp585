@@ -26,10 +26,10 @@ class _ForecastPageState extends State<ForecastPage> {
     try {
       // Use the provided location string to search for the location and get the forecast
       LocationWeatherData locationWeatherData =
-          await DataManager().searchForLocation(widget.locationString);
+          await DataManager.searchForLocation(widget.locationString);
       // we want the weekly forecast
-      return await DataManager()
-          .getForecast(locationWeatherData, ForecastType.weekly);
+      return await DataManager.getForecast(
+          locationWeatherData, ForecastType.weekly);
     } catch (e) {
       print("Error fetching seven day forecast: $e");
       // Handle error
