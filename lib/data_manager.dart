@@ -206,10 +206,10 @@ class DataManager {
     return File('${directory.path}\\Favorites_data.json');
   }
 
-  static Future<File> _saveFavoritesData(String jsonString) async {
+  static Future<void> _saveFavoritesData(String jsonString) async {
     final file = await _localFile;
     print("Writing to disk on ${file.path}");
-    return file.writeAsString(jsonString);
+    file.writeAsString(jsonString);
   }
 
   static Future<String> _readFavoritesData() async {
@@ -255,12 +255,25 @@ class DataManager {
   /// writes the new location to the favorite locations JSON file.
   static Future<void> addToFavorites(LocationWeatherData dataObj) async {
     _favoriteLocations[dataObj.searchInput!] = dataObj;
-    String data = "";
-    data = json.encode(_favoriteLocations);
-    await _saveFavoritesData(data);
+    String jsonString = favoritesToJson();
+    await _saveFavoritesData(jsonString);
     if (dataObj.hourlyForecast == null) {
       await _getHourlyForecast(dataObj.searchInput!);
     }
+  }
+
+  static Future<void> removeFromFavorites(LocationWeatherData dataObj) async {
+    if (_favoriteLocations.containsKey(dataObj.searchInput)) {
+      _favoriteLocations.remove(dataObj.searchInput);
+      String jsonString = favoritesToJson();
+      await _saveFavoritesData(jsonString);
+    }
+  }
+
+  static String favoritesToJson() {
+    String data = "";
+    data = json.encode(_favoriteLocations);
+    return data;
   }
 
   /// Turns the _favoriteLocations hashmap into a list<LocationWeatherData> then returns it.
