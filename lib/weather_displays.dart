@@ -560,7 +560,7 @@ class HourlyWeatherDisplay extends StatelessWidget {
               child: (hourlyForecasts == null) ? null : Container(
                 color: const Color(0x80E7E7E7),
                 child: Padding(
-                  padding: EdgeInsets.only(left: screenWidth / 36.0, right: screenWidth / 72.0),
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth / 36.0),
                   child: Center(
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
@@ -572,18 +572,24 @@ class HourlyWeatherDisplay extends StatelessWidget {
 
                         int currentHour = currentTime.hour;
                         String ampm = "AM";
-                        if (currentHour > 12)
+                        if (currentHour >= 12)
                         {
-                          currentHour -= 12;
                           ampm = "PM";
+                          if (currentHour > 12)
+                          {
+                            currentHour -= 12;
+                          }
                         }
                         if (currentHour == 0)
                         {
                           currentHour = 12;
                         }
 
+                        double leftPadding = (index != 0) ? screenWidth / 72.0 : 0.0;
+                        double rightPadding = (index != 23) ? screenWidth / 72.0 : 0.0;
+
                         return Padding(
-                          padding: EdgeInsets.symmetric(horizontal: screenWidth / 72.0),
+                          padding: EdgeInsets.only(left: leftPadding, right: rightPadding),
                           child: MiniWeatherDisplay(
                             topLabel: Text(
                               "$currentHour$ampm",
