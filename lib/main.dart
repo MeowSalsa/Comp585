@@ -252,8 +252,8 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
             context,
             MaterialPageRoute(
               builder: (context) => CurrentWeatherDisplay(
-                  locationString:
-                      location.searchInput ?? "something went wrong"),
+                locationString: location.searchInput ?? "something went wrong"
+              ),
             ),
           );
         },
