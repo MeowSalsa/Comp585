@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:weather_app/api_manager.dart';
+import 'package:weather_app/weather_displays.dart';
 import 'location_weather_data.dart';
 import 'data_manager.dart';
 
@@ -33,7 +34,7 @@ class _ForecastPageState extends State<ForecastPage> {
     } catch (e) {
       print("Error fetching seven day forecast: $e");
       // Handle error
-      throw e;
+      rethrow;
     }
   }
 
@@ -51,13 +52,47 @@ class _ForecastPageState extends State<ForecastPage> {
           } else if (snapshot.hasError) {
             return Center(child: Text("Error: ${snapshot.error}"));
           } else if (snapshot.hasData) {
-            return ListView.separated(
-              itemCount: snapshot.data!.properties!.periods!.length,
-              separatorBuilder: (context, index) => const Divider(),
-              itemBuilder: (context, index) {
-                var period = snapshot.data!.properties!.periods![index];
-                return _buildForecastItem(period);
-              },
+            var data = snapshot.data!.properties!.periods!;
+            int itemCount = data.length;
+
+            List<DayData> weekData = List.empty(growable: true);
+
+            if (data[0].name  == "Tonight")
+            {
+              // Move last item to start of list if data was gathered at night
+              // Since data for the morning isn't given
+              data = data.sublist(itemCount - 1) + data.sublist(0, itemCount - 1);
+              itemCount--;
+            }
+            
+            for (int i = 0; i < itemCount; i += 2)
+            {
+              String? currentDay = (i == 0) ? "Now" : data[i].name!.substring(0, 3);
+              int? currentHigh = data[i].temperature;
+              int? currentLow = data[i + 1].temperature;
+              String? currentCond = data[i].shortForecast;
+
+              weekData.add(
+                DayData(
+                  dayLabel: currentDay,
+                  low: currentLow,
+                  high: currentHigh,
+                  dayCondition: currentCond,
+                )
+              );
+            }
+            
+            return Container(
+              color: Colors.grey,
+              child: ListView.separated(
+                itemCount: weekData.length,
+                separatorBuilder: (context, index) => const Divider(),
+                itemBuilder: (context, index) {
+                  var dayData = weekData[index];
+
+                  return _buildForecastItem(dayData);
+                },
+              ),
             );
           } else {
             return const Center(child: Text('No forecast data available.'));
@@ -67,14 +102,29 @@ class _ForecastPageState extends State<ForecastPage> {
     );
   }
 
-  Widget _buildForecastItem(Periods forecast) {
+  Widget _buildForecastItem(DayData data) {
     // Build your list item with forecast data
     // This is just an example, adjust it to fit the actual data structure
     return ListTile(
-      leading: Icon(Icons.wb_sunny), // Replace with actual weather icon
-      title: Text(forecast.name ?? "Unknown"),
-      subtitle: Text(forecast.shortForecast ?? "No forecast available"),
-      trailing: Text('${forecast.temperature}°${forecast.temperatureUnit}'),
+      // Get condition icon like it is always morning
+      leading: MajorWeatherDisplay.getConditionIcon(data.dayCondition!, 40.0, DateTime.now().copyWith(hour: 10), 0.0), // Replace with actual weather icon
+      title: Text(data.dayLabel ?? "Unknown"),
+      subtitle: Text(data.dayCondition ?? "No forecast available"),
+      trailing: Text('${data.low} --> ${data.high}'),
     );
   }
+}
+
+class DayData {
+  String? dayLabel;
+  int? low;
+  int? high;
+  String? dayCondition;
+
+  DayData({
+    required this.dayLabel,
+    required this.low,
+    required this.high,
+    required this.dayCondition,
+  });
 }
