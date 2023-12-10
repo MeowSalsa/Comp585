@@ -38,6 +38,38 @@ class _ForecastPageState extends State<ForecastPage> {
     }
   }
 
+  List<DayData> groupWeekData(data) {
+    List<DayData> weekData = List.empty(growable: true);
+    int itemCount = data.length;
+
+    if (data[0].name.contains("night"))
+    {
+      // Move last item to start of list if data was gathered at night
+      // Since data for the morning isn't given
+      data = data.sublist(itemCount - 1) + data.sublist(0, itemCount - 1);
+    }
+    
+    for (int i = 0; i < itemCount; i += 2)
+    {
+      print(data[i].name!);
+      String? currentDay = (i == 0) ? "Now" : data[i].name!.substring(0, 3);
+      int? currentHigh = data[i].temperature;
+      int? currentLow = data[i + 1].temperature;
+      String? currentCond = data[i].shortForecast;
+
+      weekData.add(
+        DayData(
+          dayLabel: currentDay,
+          low: currentLow,
+          high: currentHigh,
+          dayCondition: currentCond,
+        )
+      );
+    }
+
+    return weekData;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,33 +85,30 @@ class _ForecastPageState extends State<ForecastPage> {
             return Center(child: Text("Error: ${snapshot.error}"));
           } else if (snapshot.hasData) {
             var data = snapshot.data!.properties!.periods!;
-            int itemCount = data.length;
+            List<DayData> weekData = groupWeekData(data);
 
-            List<DayData> weekData = List.empty(growable: true);
+            int minLowInd = 0;
+            int maxHighInd = 0;
 
-            if (data[0].name  == "Tonight")
+            int minLow = weekData[0].low!;
+            int maxHigh = weekData[0].high!;
+
+            for (int i = 0; i < weekData.length; i++)
             {
-              // Move last item to start of list if data was gathered at night
-              // Since data for the morning isn't given
-              data = data.sublist(itemCount - 1) + data.sublist(0, itemCount - 1);
-              itemCount--;
-            }
-            
-            for (int i = 0; i < itemCount; i += 2)
-            {
-              String? currentDay = (i == 0) ? "Now" : data[i].name!.substring(0, 3);
-              int? currentHigh = data[i].temperature;
-              int? currentLow = data[i + 1].temperature;
-              String? currentCond = data[i].shortForecast;
+              int currLow = weekData[i].low!;
+              int currHigh = weekData[i].high!;
 
-              weekData.add(
-                DayData(
-                  dayLabel: currentDay,
-                  low: currentLow,
-                  high: currentHigh,
-                  dayCondition: currentCond,
-                )
-              );
+              if (currLow < minLow)
+              {
+                minLow = currLow;
+                minLowInd = i;
+              }
+
+              if (currHigh > maxHigh)
+              {
+                maxHigh = currHigh;
+                maxHighInd = i;
+              }
             }
             
             return Container(
@@ -90,7 +119,7 @@ class _ForecastPageState extends State<ForecastPage> {
                 itemBuilder: (context, index) {
                   var dayData = weekData[index];
 
-                  return _buildForecastItem(dayData);
+                  return _buildForecastItem(dayData, index == minLowInd, index == maxHighInd);
                 },
               ),
             );
@@ -102,7 +131,7 @@ class _ForecastPageState extends State<ForecastPage> {
     );
   }
 
-  Widget _buildForecastItem(DayData data) {
+  Widget _buildForecastItem(DayData data, bool hasMinLow, bool hasMaxHigh) {
     // Build your list item with forecast data
     // This is just an example, adjust it to fit the actual data structure
     return ListTile(
@@ -110,7 +139,26 @@ class _ForecastPageState extends State<ForecastPage> {
       leading: MajorWeatherDisplay.getConditionIcon(data.dayCondition!, 40.0, DateTime.now().copyWith(hour: 10), 0.0), // Replace with actual weather icon
       title: Text(data.dayLabel ?? "Unknown"),
       subtitle: Text(data.dayCondition ?? "No forecast available"),
-      trailing: Text('${data.low} --> ${data.high}'),
+      trailing: SizedBox(
+        width: 100,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              '${data.low}',
+              style: (!hasMinLow) ? null : const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              '${data.high}',
+              style: (!hasMaxHigh) ? null : const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
