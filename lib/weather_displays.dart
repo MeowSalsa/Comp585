@@ -606,9 +606,12 @@ class HourlyWeatherDisplay extends StatelessWidget {
                             iconSize: min(screenWidth / 7.2, screenHeight / 20.0),
                             longitude: longitude
                           ),
-                        ),
-                      ),
+                        );
+                      }
                     ),
+                  ),
+                ),
+              ),
             ),
           ),
         ],

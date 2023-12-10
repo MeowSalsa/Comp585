@@ -12,10 +12,10 @@ import 'weather_displays.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Load favorites from file
-  await dataManager.loadFavorites();
-  for (var favorite in dataManager.getFavorites())
+  await DataManager.loadFavorites();
+  for (var favorite in DataManager.getFavorites())
   {
-    await dataManager.initializeLocation(favorite);
+    await DataManager.initializeLocation(favorite);
   }
   /* var newLocation = await DataManager.searchForLocation("Eugene, Oregon");
   await DataManager.addToFavorites(newLocation);
