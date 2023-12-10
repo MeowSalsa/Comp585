@@ -553,61 +553,58 @@ class HourlyWeatherDisplay extends StatelessWidget {
             width: screenWidth,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(screenHeight / 32.0),
-              child: (hourlyForecasts == null)
-                  ? null
-                  : Container(
-                      color: const Color(0x80E7E7E7),
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                            left: screenWidth / 36.0,
-                            right: screenWidth / 72.0),
-                        child: Center(
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            itemCount: 24,
-                            itemBuilder: (context, index) {
-                              DateTime currentTime = LocalTime.toLocalTime(
-                                  DateTime.parse(
-                                      hourlyForecasts![index].startTime!),
-                                  longitude);
+              child: (hourlyForecasts == null) ? null : Container(
+                color: const Color(0x80E7E7E7),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth / 36.0),
+                  child: Center(
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      itemCount: 24,
+                      itemBuilder:(context, index) {
 
-                              int currentHour = currentTime.hour;
-                              String ampm = "AM";
-                              if (currentHour > 12) {
-                                currentHour -= 12;
-                                ampm = "PM";
-                              }
-                              if (currentHour == 0) {
-                                currentHour = 12;
-                              }
+                        DateTime currentTime = LocalTime.toLocalTime(DateTime.parse(hourlyForecasts![index].startTime!), longitude);
 
-                              return Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: screenWidth / 72.0),
-                                child: MiniWeatherDisplay(
-                                    topLabel: Text(
-                                      "$currentHour$ampm",
-                                      style: TextStyle(
-                                        fontSize: screenHeight / 53.3,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    bottomLabel: Text(
-                                      "${hourlyForecasts![index].temperature}\u00B0${hourlyForecasts![index].temperatureUnit}",
-                                      style: TextStyle(
-                                        fontSize: screenHeight / 64.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    conditionString:
-                                        hourlyForecasts![index].shortForecast,
-                                    time: currentTime,
-                                    iconSize: min(
-                                        screenWidth / 7.2, screenHeight / 20.0),
-                                    longitude: longitude),
-                              );
-                            },
+                        int currentHour = currentTime.hour;
+                        String ampm = "AM";
+                        if (currentHour >= 12)
+                        {
+                          ampm = "PM";
+                          if (currentHour > 12)
+                          {
+                            currentHour -= 12;
+                          }
+                        }
+                        if (currentHour == 0)
+                        {
+                          currentHour = 12;
+                        }
+
+                        double leftPadding = (index != 0) ? screenWidth / 72.0 : 0.0;
+                        double rightPadding = (index != 23) ? screenWidth / 72.0 : 0.0;
+
+                        return Padding(
+                          padding: EdgeInsets.only(left: leftPadding, right: rightPadding),
+                          child: MiniWeatherDisplay(
+                            topLabel: Text(
+                              "$currentHour$ampm",
+                              style: TextStyle(
+                                fontSize: screenHeight / 53.3,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            bottomLabel: Text(
+                              "${hourlyForecasts![index].temperature}\u00B0${hourlyForecasts![index].temperatureUnit}",
+                              style: TextStyle(
+                                fontSize: screenHeight / 64.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            conditionString: hourlyForecasts![index].shortForecast,
+                            time: currentTime,
+                            iconSize: min(screenWidth / 7.2, screenHeight / 20.0),
+                            longitude: longitude
                           ),
                         ),
                       ),
