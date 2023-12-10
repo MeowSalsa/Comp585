@@ -11,10 +11,10 @@ import 'package:path_provider/path_provider.dart';
 enum ForecastType { now, hourly, daily, weekly }
 
 class DataManager {
-  final HashMap<String, LocationWeatherData> _recentSearches = HashMap();
-  HashMap<String, LocationWeatherData> _favoriteLocations = HashMap();
+  static final HashMap<String, LocationWeatherData> _recentSearches = HashMap();
+  static HashMap<String, LocationWeatherData> _favoriteLocations = HashMap();
 
-  dynamic getForecast(
+  static dynamic getForecast(
       LocationWeatherData locationData, Enum forecastType) async {
     String locationString = locationData.searchInput!;
     switch (forecastType) {
@@ -35,14 +35,14 @@ class DataManager {
     }
   }
 
-  Future<HourlyPeriods> _getNowForecast(String locationString) async {
+  static Future<Periods> _getNowForecast(String locationString) async {
     HourlyForecast hourlyForecast = await _getHourlyForecast(locationString);
     var nowForecast = hourlyForecast.properties?.periods?[0];
     print(nowForecast);
     return nowForecast!;
   }
 
-  Future<List<Periods>> _getDayForecast(String locationString) async {
+  static Future<List<Periods>> _getDayForecast(String locationString) async {
     List<Periods> dailyForecast = List.empty(growable: true);
     var weeklyForecast = await _getWeeklyForecast(locationString);
     //var nowForecast = weeklyForecast.properties?.periods?[0];
@@ -51,7 +51,7 @@ class DataManager {
     return dailyForecast;
   }
 
-  Future<Forecast> _getWeeklyForecast(String locationString) async {
+  static Future<Forecast> _getWeeklyForecast(String locationString) async {
     //In neither map: search for location -> add it to recent map->retrieve forecast -> return forecast
     if (!_recentSearches.containsKey(locationString) &&
         !_favoriteLocations.containsKey(locationString)) {
@@ -72,7 +72,8 @@ class DataManager {
     return forecast;
   }
 
-  Future<HourlyForecast> _getHourlyForecast(String locationString) async {
+  static Future<HourlyForecast> _getHourlyForecast(
+      String locationString) async {
     //In neither map: search for location -> add it to recent map->retrieve forecast -> return forecast
     if (!_recentSearches.containsKey(locationString) &&
         !_favoriteLocations.containsKey(locationString)) {
@@ -98,19 +99,20 @@ class DataManager {
     return hourlyForecast;
   }
 
-  Future<Forecast> _retrieveForecastFromObject(
+  static Future<Forecast> _retrieveForecastFromObject(
       LocationWeatherData locationData) async {
     var forecast = await weatherPointToForecast(locationData);
     return forecast;
   }
 
-  Future<HourlyForecast> _retrieveHourlyForecastFromObject(
+  static Future<HourlyForecast> _retrieveHourlyForecastFromObject(
       LocationWeatherData locationData) async {
     var hourlyForecast = await weatherPointToHourlyForecast(locationData);
     return hourlyForecast;
   }
 
-  Future<LocationWeatherData> searchForLocation(String stringInput) async {
+  static Future<LocationWeatherData> searchForLocation(
+      String stringInput) async {
     print("Entered 'SearchForLocation'");
     if (_recentSearches.containsKey(stringInput)) {
       print("Already in map, returning previous entry");
@@ -124,7 +126,7 @@ class DataManager {
   }
 
   //API Call stuff below
-  Future<Forecast> weatherPointToForecast(
+  static Future<Forecast> weatherPointToForecast(
       LocationWeatherData locationData) async {
     if (locationData.forecast == null ||
         (DateTime.now().difference(locationData.forecastTimeStamp!) >
@@ -136,7 +138,7 @@ class DataManager {
     return locationData.forecast!;
   }
 
-  Future<HourlyForecast> weatherPointToHourlyForecast(
+  static Future<HourlyForecast> weatherPointToHourlyForecast(
       LocationWeatherData locationData) async {
     if (locationData.hourlyForecast == null ||
         (DateTime.now().difference(locationData.hourlyForecastTimeStamp!) >
@@ -150,7 +152,8 @@ class DataManager {
     return locationData.hourlyForecast!;
   }
 
-  Future<void> initializeLocation(LocationWeatherData locationData) async {
+  static Future<void> initializeLocation(
+      LocationWeatherData locationData) async {
     CoordinatesFromLocation? locationCoordinateData;
     locationCoordinateData = await APIManager()
         .getCoordinatesFromLocation(locationData.searchInput!);
@@ -170,7 +173,7 @@ class DataManager {
     }
   }
 
-  void createDisplayableString(CoordinatesFromLocation coordinateData,
+  static void createDisplayableString(CoordinatesFromLocation coordinateData,
       LocationWeatherData locationData) {
     var addressComponents = coordinateData.results?[0].addressComponents;
     for (var component in addressComponents!) {
@@ -190,12 +193,12 @@ class DataManager {
   }
 
 // File management stuff below
-  Future<String> get _localPath async {
+  static Future<String> get _localPath async {
     var dir = await getApplicationDocumentsDirectory();
     return dir.path;
   }
 
-  Future<File> get _localFile async {
+  static Future<File> get _localFile async {
     final path = await _localPath;
     final directory = Directory('$path\\Weather_Application\\Data');
     if (!directory.existsSync()) {
@@ -205,13 +208,13 @@ class DataManager {
     return File('${directory.path}\\Favorites_data.json');
   }
 
-  Future<File> _saveFavoritesData(String jsonString) async {
+  static Future<void> _saveFavoritesData(String jsonString) async {
     final file = await _localFile;
     print("Writing to disk on ${file.path}");
-    return file.writeAsString(jsonString);
+    file.writeAsString(jsonString);
   }
 
-  Future<String> _readFavoritesData() async {
+  static Future<String> _readFavoritesData() async {
     try {
       final file = await _localFile;
       print("Reading from disk on ${file.path}");
@@ -228,7 +231,7 @@ class DataManager {
 
   /// Asynchronous function that reads the user's favorites locations and
   /// populates a _FavoriteLocations hashmap with the data.
-  Future<void> loadFavorites() async {
+  static Future<void> loadFavorites() async {
     print("Loading...");
     String fileContents = await _readFavoritesData();
     if (fileContents != "Error reading file") {
@@ -243,7 +246,7 @@ class DataManager {
   }
 
   ///Initializes the hourlyForecasts that the Main Menu requires.
-  Future<void> initializeFavoriteForecasts() async {
+  static Future<void> initializeFavoriteForecasts() async {
     for (var value in _favoriteLocations.values) {
       print("Initializing Hourly Forecast for ${value.searchInput}");
       await _getHourlyForecast(value.searchInput!);
@@ -252,18 +255,31 @@ class DataManager {
 
   /// Adds a LocationWeatherData object to the _FavoriteLocations hashmap, and asynchronously
   /// writes the new location to the favorite locations JSON file.
-  Future<void> addToFavorites(LocationWeatherData dataObj) async {
+  static Future<void> addToFavorites(LocationWeatherData dataObj) async {
     _favoriteLocations[dataObj.searchInput!] = dataObj;
-    String data = "";
-    data = json.encode(_favoriteLocations);
-    await _saveFavoritesData(data);
+    String jsonString = favoritesToJson();
+    await _saveFavoritesData(jsonString);
     if (dataObj.hourlyForecast == null) {
       await _getHourlyForecast(dataObj.searchInput!);
     }
   }
 
+  static Future<void> removeFromFavorites(LocationWeatherData dataObj) async {
+    if (_favoriteLocations.containsKey(dataObj.searchInput)) {
+      _favoriteLocations.remove(dataObj.searchInput);
+      String jsonString = favoritesToJson();
+      await _saveFavoritesData(jsonString);
+    }
+  }
+
+  static String favoritesToJson() {
+    String data = "";
+    data = json.encode(_favoriteLocations);
+    return data;
+  }
+
   /// Turns the _favoriteLocations hashmap into a list<LocationWeatherData> then returns it.
-  List<LocationWeatherData> getFavorites() {
+  static List<LocationWeatherData> getFavorites() {
     List<LocationWeatherData> favoritesList = List.empty(growable: true);
     _favoriteLocations.forEach((key, value) {
       favoritesList.add(value);
@@ -271,9 +287,7 @@ class DataManager {
     return favoritesList;
   }
 
-//Function to get the forecast at the current time for the main menu. Done synchronously because
-//The favorites data shouldve been initialized previously.
-  HourlyPeriods getNowForecast(LocationWeatherData currentLocation) {
+  static Periods getNowForecast(LocationWeatherData currentLocation) {
     return currentLocation.nowForecast!;
   }
 }

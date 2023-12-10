@@ -9,7 +9,6 @@ import 'local_time.dart';
 import 'daily_weather.dart';
 import 'weather_displays.dart';
 
-DataManager dataManager = DataManager();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Load favorites from file
@@ -18,6 +17,16 @@ void main() async {
   {
     await dataManager.initializeLocation(favorite);
   }
+  /* var newLocation = await DataManager.searchForLocation("Eugene, Oregon");
+  await DataManager.addToFavorites(newLocation);
+  newLocation = await DataManager.searchForLocation("91331");
+  await DataManager.addToFavorites(newLocation);
+  newLocation = await DataManager.searchForLocation("Los Angeles, California");
+  await DataManager.addToFavorites(newLocation);
+  newLocation = await DataManager.searchForLocation("Houston, Texas");
+  await DataManager.addToFavorites(newLocation);
+  newLocation = await DataManager.searchForLocation("New York, New York");
+  await DataManager.addToFavorites(newLocation); */
   runApp(const RootApp());
 }
 
@@ -173,26 +182,26 @@ class CurvedSquareIcon extends StatefulWidget {
 }
 
 class _CurvedSquareIconState extends State<CurvedSquareIcon> {
-  late Future<List<HourlyPeriods>> weatherForecasts;
+  late Future<List<Periods>> weatherForecasts;
   late List<LocationWeatherData> favoriteLocations;
 
   @override
   void initState() {
     super.initState();
     weatherForecasts = fetchWeatherForecasts();
-    favoriteLocations = dataManager.getFavorites();
+    favoriteLocations = DataManager.getFavorites();
     print(favoriteLocations.length);
   }
 
-  Future<List<HourlyPeriods>> fetchWeatherForecasts() async {
-    await dataManager.loadFavorites(); // Load favorites from file
-    List<LocationWeatherData> favorites = dataManager.getFavorites();
+  Future<List<Periods>> fetchWeatherForecasts() async {
+    await DataManager.loadFavorites(); // Load favorites from file
+    List<LocationWeatherData> favorites = DataManager.getFavorites();
 
-    List<HourlyPeriods> forecasts = [];
+    List<Periods> forecasts = [];
     for (var favorite in favorites) {
       try {
-        HourlyPeriods forecast =
-            await dataManager.getForecast(favorite, ForecastType.now);
+        Periods forecast =
+            await DataManager.getForecast(favorite, ForecastType.now);
         forecasts.add(forecast);
       } catch (e) {
         print('Error fetching forecast for ${favorite.searchInput}: $e');
@@ -220,18 +229,20 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
     }
   }
 
+
   Widget _buildWeatherBoxWithLocationObject(BuildContext context, LocationWeatherData location) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
     var city = location.displayableString ?? 'Unknown Location';
-    var currentForecast = dataManager.getNowForecast(location);
+    var currentForecast = DataManager.getNowForecast(location);
     var temperature = '${currentForecast.temperature ?? 'N/A'}°';
     String weather = currentForecast.shortForecast ?? 'Unavailable';
 
     TimeBasedColorScheme colorScheme = TimeBasedColorScheme.colorSchemeFromLocalTime(LocalTime.getLocalDayPercent(location.long));
 
     print("${location.displayableString} (${location.long}) last updated at ${location.hourlyForecastTimeStamp}");
+    
     // This widget builds each individual weather box with the city, temperature, and weather condition.
     return Material(
       color: Colors.transparent,

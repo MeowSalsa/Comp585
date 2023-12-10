@@ -6,8 +6,8 @@ import 'colors.dart';
 import 'local_time.dart';
 import 'location_weather_data.dart';
 import 'weather_displays.dart';
-class CurrentWeatherDisplay extends StatelessWidget {
 
+class CurrentWeatherDisplay extends StatelessWidget {
   final String locationString;
   final WeatherData weatherData = WeatherData();
 
@@ -18,7 +18,6 @@ class CurrentWeatherDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     double topPadding = MediaQuery.of(context).viewPadding.top;
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -28,63 +27,63 @@ class CurrentWeatherDisplay extends StatelessWidget {
     return FutureBuilder(
       future: weatherData.getCurrentWeather(),
       builder: (context, snapshot) {
-
-        if(snapshot.hasError){
+        if (snapshot.hasError) {
           return const CircularProgressIndicator();
         }
 
         final TextTheme textTheme = Theme.of(context).textTheme.apply(
-          bodyColor: Colors.white,
-          displayColor: Colors.white,
-        );
+              bodyColor: Colors.white,
+              displayColor: Colors.white,
+            );
 
-        final TimeBasedColorScheme colorScheme = TimeBasedColorScheme.colorSchemeFromLocalTime(LocalTime.getLocalDayPercent(weatherData.locationLongitude));
+        final TimeBasedColorScheme colorScheme =
+            TimeBasedColorScheme.colorSchemeFromLocalTime(
+                LocalTime.getLocalDayPercent(weatherData.locationLongitude));
 
         return Theme(
           data: Theme.of(context).copyWith(textTheme: textTheme),
           child: Scaffold(
-            
             body: Stack(
-              children:[
+              children: [
                 Container(
                   width: screenWidth,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [
-                        colorScheme.skyStartColor,
-                        colorScheme.skyEndColor,
-                        colorScheme.skyEndColor,
-                        colorScheme.mainBGColor,
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      stops: const [0.0, 0.75, 0.76, 0.77],
-                      tileMode: TileMode.clamp
-                    ),
+                        colors: [
+                          colorScheme.skyStartColor,
+                          colorScheme.skyEndColor,
+                          colorScheme.skyEndColor,
+                          colorScheme.mainBGColor,
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        stops: const [0.0, 0.75, 0.76, 0.77],
+                        tileMode: TileMode.clamp),
                   ),
                   child: Center(
                     child: ListView(
                       shrinkWrap: true,
                       children: [
-
                         Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-
                               SizedBox(
                                 width: screenWidth,
-                                height: screenHeight - bottomBarHeight - topPadding,
+                                height:
+                                    screenHeight - bottomBarHeight - topPadding,
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Padding(
-                                      padding: EdgeInsets.only(left: screenHeight / 50.0, top: screenHeight / 75.0),
-
+                                      padding: EdgeInsets.only(
+                                          left: screenHeight / 50.0,
+                                          top: screenHeight / 75.0),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
                                         children: [
-
                                           Flexible(
                                             child: FittedBox(
                                               fit: BoxFit.scaleDown,
@@ -93,23 +92,26 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                                 onTap: () {
                                                   Navigator.pop(context);
                                                 },
-
                                                 child: Row(
                                                   children: [
                                                     Icon(
-                                                      Icons.arrow_back_ios_new_rounded,
+                                                      Icons
+                                                          .arrow_back_ios_new_rounded,
                                                       color: Colors.white,
                                                       size: screenHeight / 32.0,
                                                     ),
-
-                                                    Padding(padding: EdgeInsets.only(left: screenHeight / 53.0)),
-
+                                                    Padding(
+                                                        padding: EdgeInsets.only(
+                                                            left: screenHeight /
+                                                                53.0)),
                                                     Text(
                                                       "${weatherData.currentCity}",
                                                       maxLines: 1,
                                                       style: TextStyle(
-                                                        fontSize: screenHeight / 35.0,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontSize:
+                                                            screenHeight / 35.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                       ),
                                                     ),
                                                   ],
@@ -123,16 +125,22 @@ class CurrentWeatherDisplay extends StatelessWidget {
 
                                     // MAJOR WEATHER DISPLAY
                                     MajorWeatherDisplay(
-                                      temperatureLabel: "${weatherData.currentTemp}\u00B0${weatherData.currentUnits}", 
+                                      temperatureLabel:
+                                          "${weatherData.currentTemp}\u00B0${weatherData.currentUnits}",
                                       longitude: weatherData.locationLongitude,
-                                      conditionLabel: "${weatherData.currentCond}",
+                                      conditionLabel:
+                                          "${weatherData.currentCond}",
                                     ),
 
                                     const Spacer(),
-                                    
+
                                     Container(
                                       color: colorScheme.mainBGColor,
-                                      child: HourlyWeatherDisplay(hourlyForecasts: weatherData.futurePeriods, longitude: weatherData.locationLongitude),
+                                      child: HourlyWeatherDisplay(
+                                          hourlyForecasts:
+                                              weatherData.futurePeriods,
+                                          longitude:
+                                              weatherData.locationLongitude),
                                     ),
                                   ],
                                 ),
@@ -145,22 +153,40 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                   color: colorScheme.mainBGColor,
                                   child: Column(
                                     children: [
-
                                       GridView(
                                         shrinkWrap: true,
-                                        physics: const NeverScrollableScrollPhysics(),
-                                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: 1, crossAxisCount: 2),
-
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        gridDelegate:
+                                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                                childAspectRatio: 1,
+                                                crossAxisCount: 2),
                                         children: [
-                                          WindDisplay(windSpeed: weatherData.currentWindSpeed, windDirection: weatherData.currentWindDirection,),
-                                          PrecipitationDisplay(precipitationChance: weatherData.currentPrecipitationChance,),
-                                          HumidityDisplay(humidityPercent: weatherData.currentHumidity,),
-                                          DewPointDisplay(dewPoint: weatherData.currentDewPoint,),
+                                          WindDisplay(
+                                            windSpeed:
+                                                weatherData.currentWindSpeed,
+                                            windDirection: weatherData
+                                                .currentWindDirection,
+                                          ),
+                                          PrecipitationDisplay(
+                                            precipitationChance: weatherData
+                                                .currentPrecipitationChance,
+                                          ),
+                                          HumidityDisplay(
+                                            humidityPercent:
+                                                weatherData.currentHumidity,
+                                          ),
+                                          DewPointDisplay(
+                                            dewPoint:
+                                                weatherData.currentDewPoint,
+                                          ),
                                         ],
                                       ),
 
                                       // Placeholder for buttons
-                                      Padding(padding: EdgeInsets.only(top: bottomBarHeight)),
+                                      Padding(
+                                          padding: EdgeInsets.only(
+                                              top: bottomBarHeight)),
                                     ],
                                   ),
                                 ),
@@ -203,7 +229,6 @@ class CurrentWeatherDisplay extends StatelessWidget {
                               ],
                             ),
                           ),
-
                           SizedBox(
                             height: bottomBarHeight,
                             width: screenWidth * 7.0 / 8.0,
@@ -212,7 +237,6 @@ class CurrentWeatherDisplay extends StatelessWidget {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-
                                   Text(
                                     "Bottom BAR",
                                     style: TextStyle(
@@ -262,7 +286,6 @@ class CurrentWeatherDisplay extends StatelessWidget {
 }
 
 class WeatherData {
-
   String? locationString;
 
   WeatherData({
@@ -280,22 +303,22 @@ class WeatherData {
   String? currentDewPoint;
   String? time;
   double? locationLongitude;
-  List<HourlyPeriods>? futurePeriods;
+  List<Periods>? futurePeriods;
 
   bool isFirstTimeLoad = true;
 
   Future<void> getCurrentWeather() async {
-
-    if (!isFirstTimeLoad)
-    {
+    if (!isFirstTimeLoad) {
       return;
     }
 
-    DataManager newDM = DataManager();
-    LocationWeatherData weatherLocation = await newDM.searchForLocation(locationString!);
-    HourlyForecast forecast = await newDM.getForecast(weatherLocation, ForecastType.hourly);
-    HourlyPeriods currentPeriod = forecast.properties!.periods![0];
-    ProbabilityOfPrecipitation? precipitation = currentPeriod.probabilityOfPrecipitation;
+    LocationWeatherData weatherLocation =
+        await DataManager.searchForLocation(locationString!);
+    HourlyForecast forecast =
+        await DataManager.getForecast(weatherLocation, ForecastType.hourly);
+    Periods currentPeriod = forecast.properties!.periods![0];
+    ProbabilityOfPrecipitation? precipitation =
+        currentPeriod.probabilityOfPrecipitation;
     ProbabilityOfPrecipitation? humidity = currentPeriod.relativeHumidity;
     Elevation? dewPoint = currentPeriod.dewpoint;
 
@@ -303,11 +326,12 @@ class WeatherData {
     currentTemp = currentPeriod.temperature;
     currentUnits = currentPeriod.temperatureUnit;
     currentCond = currentPeriod.shortForecast;
-    
+
     currentWindSpeed = currentPeriod.windSpeed;
     currentWindDirection = currentPeriod.windDirection;
 
-    currentPrecipitationChance = formatUnitValueString(precipitation!.value, precipitation.unitCode);
+    currentPrecipitationChance =
+        formatUnitValueString(precipitation!.value, precipitation.unitCode);
     currentHumidity = formatUnitValueString(humidity!.value, humidity.unitCode);
 
     // Dew Point is in Celsius
@@ -321,25 +345,18 @@ class WeatherData {
     isFirstTimeLoad = false;
   }
 
-  String? formatUnitValueString(int? value, String? unitCode)
-  {
+  String? formatUnitValueString(int? value, String? unitCode) {
     String? displayString = "";
 
-    if (value == null)
-    {
+    if (value == null) {
       displayString += "0";
-    }
-    else
-    {
+    } else {
       displayString += "$value";
     }
-    
-    if (unitCode!.contains("percent"))
-    {
+
+    if (unitCode!.contains("percent")) {
       displayString += "%";
-    }
-    else
-    {
+    } else {
       displayString += unitCode;
     }
 

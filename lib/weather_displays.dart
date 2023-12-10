@@ -7,7 +7,6 @@ import 'local_time.dart';
 import 'weather_icons.dart';
 
 class MajorWeatherDisplay extends StatelessWidget {
-
   final String temperatureLabel;
   final String conditionLabel;
   final double? longitude;
@@ -19,8 +18,8 @@ class MajorWeatherDisplay extends StatelessWidget {
     required this.longitude,
   });
 
-  static Widget getConditionIcon(String condition, double iconSize, DateTime time, double? longitude) {
-    
+  static Widget getConditionIcon(
+      String condition, double iconSize, DateTime time, double? longitude) {
     Widget sun = Padding(
       padding: EdgeInsets.all(iconSize / 4.0),
       child: Icon(
@@ -31,13 +30,12 @@ class MajorWeatherDisplay extends StatelessWidget {
     );
 
     Widget moon = Padding(
-      padding: EdgeInsets.all(iconSize / 2.9),
-      child: Icon(
-        WeatherIcons.moon,
-        color: Colors.white,
-        size: iconSize * 0.8,
-      )
-    );
+        padding: EdgeInsets.all(iconSize / 2.9),
+        child: Icon(
+          WeatherIcons.moon,
+          color: Colors.white,
+          size: iconSize * 0.8,
+        ));
 
     Widget partlySun = Padding(
       padding: EdgeInsets.symmetric(vertical: iconSize / 20.0),
@@ -86,7 +84,7 @@ class MajorWeatherDisplay extends StatelessWidget {
 
     Widget rainy = Padding(
       padding: EdgeInsets.all(iconSize / 4.0),
-        child: Stack(
+      child: Stack(
         children: [
           Icon(
             WeatherIcons.cloud_precipitation,
@@ -120,24 +118,20 @@ class MajorWeatherDisplay extends StatelessWidget {
       ),
     );
 
-    switch(condition) {
+    switch (condition) {
       case String s when (s.contains("Partly") || s.contains("Mostly")):
         double dayPercent = LocalTime.getDayPercent(time);
-        if (dayPercent > 0.25 && dayPercent < 0.75)
-        {
+        if (dayPercent > 0.25 && dayPercent < 0.75) {
           return partlySun;
-        }
-        else
-        {
+        } else {
           return partlyMoon;
         }
-        
+
       case String s when (s.contains("Cloudy") || s.contains("Fog")):
         return cloudy;
 
       case String s when (s.contains("Rain") || s.contains("Showers")):
-        if (s.contains("Chance") || s.contains("Likely"))
-        {
+        if (s.contains("Chance") || s.contains("Likely")) {
           return cloudy;
         }
         return rainy;
@@ -155,14 +149,14 @@ class MajorWeatherDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Column(
       children: [
         // Condition icon
         Container(
-          child: getConditionIcon(conditionLabel, screenHeight / 3.8, DateTime.now(), longitude),
+          child: getConditionIcon(
+              conditionLabel, screenHeight / 3.8, DateTime.now(), longitude),
         ),
 
         // Temperature
@@ -187,7 +181,6 @@ class MajorWeatherDisplay extends StatelessWidget {
 }
 
 class MinorWeatherDisplay extends StatelessWidget {
-
   final String? titleText;
   final Widget displayWidget;
 
@@ -200,100 +193,106 @@ class MinorWeatherDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    
+
     return Padding(
       padding: EdgeInsets.all(screenWidth / 24.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(screenWidth / 18.0),
         child: Container(
-          padding: EdgeInsets.all(screenWidth / 24.0),
-          color: const Color(0x80E7E7E7),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children:[
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child:
-                Text(
-                  "$titleText",
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    fontSize: screenWidth / 22.5,
-                  ),
-                ),
-              ),
-
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: displayWidget,
+            padding: EdgeInsets.all(screenWidth / 24.0),
+            color: const Color(0x80E7E7E7),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      "$titleText",
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontSize: screenWidth / 22.5,
+                      ),
                     ),
-                  ]
-                ),
-              ),
-            ]
-          )
-        ),
+                  ),
+                  Expanded(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Center(
+                            child: displayWidget,
+                          ),
+                        ]),
+                  ),
+                ])),
       ),
     );
   }
 }
 
 class WindDisplay extends StatelessWidget {
-  
   final String? windSpeed;
   final String? windDirection;
 
-  const WindDisplay({
-    super.key,
-    required this.windSpeed,
-    required this.windDirection
-  });
+  const WindDisplay(
+      {super.key, required this.windSpeed, required this.windDirection});
 
-  double directionToRotation(String dir)
-  {
+  double directionToRotation(String dir) {
     double rotation = 0;
 
     double rotationInfluence = 90.0;
-    for (int i = 0; i < dir.length; i++)
-    {
+    for (int i = 0; i < dir.length; i++) {
       double correctRotInf;
-      switch (dir.substring(i, i + 1))
-      {
+      switch (dir.substring(i, i + 1)) {
         case 'N':
-          correctRotInf = (i > 0) ? correctRotationInfluence(0, rotation, rotationInfluence) : 0;
-          rotation += (((rotation + correctRotInf) - 0).abs() < (rotation - 0).abs()) ? correctRotInf : 0.0;
+          correctRotInf = (i > 0)
+              ? correctRotationInfluence(0, rotation, rotationInfluence)
+              : 0;
+          rotation +=
+              (((rotation + correctRotInf) - 0).abs() < (rotation - 0).abs())
+                  ? correctRotInf
+                  : 0.0;
           break;
         case 'E':
-          correctRotInf = (i > 0) ? correctRotationInfluence(90, rotation, rotationInfluence) : 90;
-          rotation += (((rotation + correctRotInf) - 90).abs() < (rotation - 90).abs()) ? correctRotInf : 0.0;
+          correctRotInf = (i > 0)
+              ? correctRotationInfluence(90, rotation, rotationInfluence)
+              : 90;
+          rotation +=
+              (((rotation + correctRotInf) - 90).abs() < (rotation - 90).abs())
+                  ? correctRotInf
+                  : 0.0;
           break;
         case 'S':
           // check if current angle is closer to +180 than -180
           int targetRot = 180;
-          if (rotation >= 0)
-          {
+          if (rotation >= 0) {
             // make influence move closer to +180 if positive
-            correctRotInf = (i > 0) ? correctRotationInfluence(180, rotation, rotationInfluence) : 180;
-          }
-          else
-          {
+            correctRotInf = (i > 0)
+                ? correctRotationInfluence(180, rotation, rotationInfluence)
+                : 180;
+          } else {
             // make influence move closer to -180 if negative
             targetRot = -180;
-            correctRotInf = (i > 0) ? correctRotationInfluence(-180, rotation, rotationInfluence) : -180;
+            correctRotInf = (i > 0)
+                ? correctRotationInfluence(-180, rotation, rotationInfluence)
+                : -180;
           }
-          rotation += (((rotation + correctRotInf) - targetRot).abs() < (rotation - targetRot).abs()) ? correctRotInf : 0.0;
+          rotation += (((rotation + correctRotInf) - targetRot).abs() <
+                  (rotation - targetRot).abs())
+              ? correctRotInf
+              : 0.0;
           break;
         case 'W':
-          if (rotation > 0)
-          {
+          if (rotation > 0) {
             rotation = -rotation;
           }
-          correctRotInf = (i > 0) ? correctRotationInfluence(-90, rotation, rotationInfluence) : -90;
-          rotation += (((rotation + correctRotInf) + 90).abs() < (rotation + 90).abs()) ? correctRotInf : 0.0;
+          correctRotInf = (i > 0)
+              ? correctRotationInfluence(-90, rotation, rotationInfluence)
+              : -90;
+          rotation +=
+              (((rotation + correctRotInf) + 90).abs() < (rotation + 90).abs())
+                  ? correctRotInf
+                  : 0.0;
           break;
       }
 
@@ -303,8 +302,8 @@ class WindDisplay extends StatelessWidget {
     return rotation;
   }
 
-  double correctRotationInfluence(double targetRot, double currentRot, double rotInf)
-  {
+  double correctRotationInfluence(
+      double targetRot, double currentRot, double rotInf) {
     return (currentRot < targetRot) ? rotInf : -rotInf;
   }
 
@@ -312,13 +311,19 @@ class WindDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double compassSize = screenWidth / 4;
-    double needleAngle = (windDirection != null) ? directionToRotation(windDirection!) * (pi / 180) : 0;
-    
-    String windSpeedValue = (windSpeed != null && windSpeed!.length > 3) ? windSpeed!.substring(0, windSpeed!.indexOf(" ")) : "";
-    String windSpeedUnit = (windSpeed != null) ? windSpeed!.substring(windSpeed!.indexOf(" ") + 1) : "";
+    double needleAngle = (windDirection != null)
+        ? directionToRotation(windDirection!) * (pi / 180)
+        : 0;
+
+    String windSpeedValue = (windSpeed != null && windSpeed!.length > 3)
+        ? windSpeed!.substring(0, windSpeed!.indexOf(" "))
+        : "";
+    String windSpeedUnit = (windSpeed != null)
+        ? windSpeed!.substring(windSpeed!.indexOf(" ") + 1)
+        : "";
 
     return MinorWeatherDisplay(
-      titleText: "WIND", 
+      titleText: "WIND",
       displayWidget: Center(
         child: Stack(
           children: [
@@ -331,7 +336,6 @@ class WindDisplay extends StatelessWidget {
                 size: compassSize,
               ),
             ),
-
             Transform.rotate(
               angle: needleAngle,
               child: SizedBox(
@@ -346,7 +350,6 @@ class WindDisplay extends StatelessWidget {
                 ),
               ),
             ),
-
             SizedBox(
               width: compassSize,
               height: compassSize,
@@ -378,7 +381,6 @@ class WindDisplay extends StatelessWidget {
 }
 
 class PrecipitationDisplay extends StatelessWidget {
-  
   final String? precipitationChance;
 
   const PrecipitationDisplay({
@@ -391,7 +393,7 @@ class PrecipitationDisplay extends StatelessWidget {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return MinorWeatherDisplay(
-      titleText: "PRECIPITATION", 
+      titleText: "PRECIPITATION",
       displayWidget: Column(
         children: [
           Padding(padding: EdgeInsets.only(top: screenWidth / 48.0)),
@@ -414,7 +416,6 @@ class PrecipitationDisplay extends StatelessWidget {
 }
 
 class HumidityDisplay extends StatelessWidget {
-  
   final String? humidityPercent;
 
   const HumidityDisplay({
@@ -427,7 +428,7 @@ class HumidityDisplay extends StatelessWidget {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return MinorWeatherDisplay(
-      titleText: "HUMIDITY", 
+      titleText: "HUMIDITY",
       displayWidget: Column(
         children: [
           Padding(padding: EdgeInsets.only(top: screenWidth / 48.0)),
@@ -450,7 +451,6 @@ class HumidityDisplay extends StatelessWidget {
 }
 
 class DewPointDisplay extends StatelessWidget {
-  
   final String? dewPoint;
 
   const DewPointDisplay({
@@ -463,7 +463,7 @@ class DewPointDisplay extends StatelessWidget {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return MinorWeatherDisplay(
-      titleText: "DEW POINT", 
+      titleText: "DEW POINT",
       displayWidget: Column(
         children: [
           Padding(padding: EdgeInsets.only(top: screenWidth / 48.0)),
@@ -486,7 +486,6 @@ class DewPointDisplay extends StatelessWidget {
 }
 
 class MiniWeatherDisplay extends StatelessWidget {
-
   final Widget? topLabel;
   final String? conditionString;
   final Widget? bottomLabel;
@@ -494,16 +493,14 @@ class MiniWeatherDisplay extends StatelessWidget {
   final DateTime time;
   final double? longitude;
 
-
-  const MiniWeatherDisplay({
-    super.key,
-    required this.topLabel,
-    required this.conditionString,
-    required this.bottomLabel,
-    required this.iconSize,
-    required this.time,
-    required this.longitude
-  });
+  const MiniWeatherDisplay(
+      {super.key,
+      required this.topLabel,
+      required this.conditionString,
+      required this.bottomLabel,
+      required this.iconSize,
+      required this.time,
+      required this.longitude});
 
   @override
   Widget build(BuildContext context) {
@@ -511,7 +508,8 @@ class MiniWeatherDisplay extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         topLabel ?? const Spacer(),
-        MajorWeatherDisplay.getConditionIcon(conditionString!, iconSize, time, longitude),
+        MajorWeatherDisplay.getConditionIcon(
+            conditionString!, iconSize, time, longitude),
         bottomLabel ?? const Spacer(),
       ],
     );
@@ -519,8 +517,7 @@ class MiniWeatherDisplay extends StatelessWidget {
 }
 
 class HourlyWeatherDisplay extends StatelessWidget {
-
-  final List<HourlyPeriods>? hourlyForecasts;
+  final List<Periods>? hourlyForecasts;
   final double? longitude;
 
   const HourlyWeatherDisplay({
@@ -535,7 +532,8 @@ class HourlyWeatherDisplay extends StatelessWidget {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(screenHeight / 42.6, screenHeight / 68, screenHeight / 42.6, screenHeight / 42.6),
+      padding: EdgeInsets.fromLTRB(screenHeight / 42.6, screenHeight / 68,
+          screenHeight / 42.6, screenHeight / 42.6),
       child: Column(
         children: [
           Row(
@@ -549,9 +547,7 @@ class HourlyWeatherDisplay extends StatelessWidget {
               ),
             ],
           ),
-
           Padding(padding: EdgeInsets.only(top: screenHeight / 64.0)),
-
           SizedBox(
             height: screenHeight / 7.2,
             width: screenWidth,
@@ -610,12 +606,9 @@ class HourlyWeatherDisplay extends StatelessWidget {
                             iconSize: min(screenWidth / 7.2, screenHeight / 20.0),
                             longitude: longitude
                           ),
-                        );
-                      },
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
             ),
           ),
         ],
