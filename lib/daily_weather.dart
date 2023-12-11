@@ -77,13 +77,12 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
+                                    // Location Title
                                     Padding(
                                       padding: EdgeInsets.only(
                                         left: screenHeight / 50.0,
                                         top: screenHeight / 75.0
                                       ),
-
-                                      // Location Title
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         children: [
@@ -171,7 +170,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
 
                                       NavigationButton(
                                         label: "Weekly Forecast",
-                                        destinationWidget: ForecastPage(locationString: locationString),
+                                        destinationWidget: ForecastPage(locationString: weatherData.currentCity!),
                                       ),
 
                                       // Placeholder for buttons
