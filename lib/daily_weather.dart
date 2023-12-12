@@ -221,15 +221,32 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                 itemCount: weatherData.favoriteLocationNames.length,
                                 itemBuilder:(context, index) {
                                   String currentFavorite = weatherData.favoriteLocationNames[index];
+                                  bool isViewingFavorite = weatherData.locationString!.contains(currentFavorite);
                                   return Row(
                                     children: [
-                                      Text(
-                                        currentFavorite,
-                                        style: TextStyle(
-                                          fontSize: screenWidth / 20.0,
-                                          fontWeight: (weatherData.locationString!.contains(currentFavorite)) 
-                                          ? FontWeight.bold
-                                          : null
+                                      GestureDetector(
+                                        onTap: () {
+                                          if (isViewingFavorite) {
+                                            return;
+                                          }
+                                          Navigator.pop(context);
+                                          Navigator.push(
+                                            context, 
+                                            MaterialPageRoute(
+                                              builder: (context) => CurrentWeatherDisplay(
+                                                locationString: currentFavorite
+                                              ),
+                                            )
+                                          );
+                                        },
+                                        child: Text(
+                                          currentFavorite,
+                                          style: TextStyle(
+                                            fontSize: screenWidth / 20.0,
+                                            fontWeight: (isViewingFavorite) 
+                                            ? FontWeight.bold
+                                            : null
+                                          ),
                                         ),
                                       ),
 
@@ -397,6 +414,7 @@ class WeatherData {
   }
 
   Future<void> getFavoriteNames() async {
+    favoriteLocationNames = [];
     for (var favorite in DataManager.getFavorites()) {
       String favName = favorite.displayableString!;
       favoriteLocationNames.add(favName.substring(0, favName.indexOf(",")));
