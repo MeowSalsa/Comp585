@@ -532,8 +532,12 @@ class HourlyWeatherDisplay extends StatelessWidget {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(screenHeight / 42.6, screenHeight / 68,
-          screenHeight / 42.6, screenHeight / 42.6),
+      padding: EdgeInsets.fromLTRB(
+        screenHeight / 42.6, 
+        screenHeight / 68,
+        screenHeight / 42.6,
+        screenHeight / 42.6
+      ),
       child: Column(
         children: [
           Row(
