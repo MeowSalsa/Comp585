@@ -86,10 +86,16 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 }
 
-class MyApp extends StatelessWidget {
-  final TextEditingController _controller = TextEditingController();
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
-  MyApp({super.key});
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final TextEditingController _controller = TextEditingController();
+  List<LocationWeatherData> favoriteLocations = DataManager.getFavorites();
 
   String getOrdinal(int num)
   {
@@ -116,7 +122,7 @@ class MyApp extends StatelessWidget {
     DateTime currentDate = DateTime.now();
     String formattedDate = DateFormat('EEEE, MMMM d, y').format(currentDate);
     formattedDate = formattedDate.substring(0, formattedDate.lastIndexOf(",")) + getOrdinal(currentDate.day) + formattedDate.substring(formattedDate.lastIndexOf(","));
-    
+
     return Scaffold(
       backgroundColor: Colors.lightBlue[50],
       appBar: PreferredSize(
@@ -138,14 +144,18 @@ class MyApp extends StatelessWidget {
                   borderSide: BorderSide.none,
                 ),
               ),
-              onSubmitted: (value) {
-                Navigator.push(
+              onSubmitted: (value) async {
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
                         CurrentWeatherDisplay(locationString: _controller.text),
                   ),
                 );
+
+                setState(() {
+                  favoriteLocations = DataManager.getFavorites();
+                });
               },
             ),
           ),
@@ -166,7 +176,7 @@ class MyApp extends StatelessWidget {
               ),
             ),
             const Padding(padding: EdgeInsets.only(top: 20.0)),
-            const Expanded(child: CurvedSquareIcon()),
+            Expanded(child: CurvedSquareIcon(favoriteLocations: favoriteLocations)),
           ],
         ),
       ),
@@ -175,7 +185,11 @@ class MyApp extends StatelessWidget {
 }
 
 class CurvedSquareIcon extends StatefulWidget {
-  const CurvedSquareIcon({Key? key}) : super(key: key);
+  List<LocationWeatherData> favoriteLocations;
+  CurvedSquareIcon({
+    super.key,
+    required this.favoriteLocations,
+  });
 
   @override
   _CurvedSquareIconState createState() => _CurvedSquareIconState();
@@ -183,14 +197,13 @@ class CurvedSquareIcon extends StatefulWidget {
 
 class _CurvedSquareIconState extends State<CurvedSquareIcon> {
   late Future<List<Periods>> weatherForecasts;
-  late List<LocationWeatherData> favoriteLocations;
+  
 
   @override
   void initState() {
     super.initState();
     weatherForecasts = fetchWeatherForecasts();
-    favoriteLocations = DataManager.getFavorites();
-    print(favoriteLocations.length);
+    print(widget.favoriteLocations.length);
   }
 
   Future<List<Periods>> fetchWeatherForecasts() async {
@@ -213,13 +226,13 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
   @override
   Widget build(BuildContext context) {
 
-    if (favoriteLocations.isNotEmpty) {
+    if (widget.favoriteLocations.isNotEmpty) {
       return GridView.count(
         crossAxisCount: 2,
         crossAxisSpacing: 20.0, // Horizontal spacing between grid items
         mainAxisSpacing: 20.0, // Vertical spacing between grid items
         childAspectRatio: 1.0, // Aspect ratio for items in the grid
-        children: favoriteLocations
+        children: widget.favoriteLocations
             .map((location) =>
                 _buildWeatherBoxWithLocationObject(context, location))
             .toList(),
@@ -247,8 +260,8 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => CurrentWeatherDisplay(
@@ -256,6 +269,10 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
               ),
             ),
           );
+
+          setState(() {
+            widget.favoriteLocations = DataManager.getFavorites();
+          });
         },
         child: Container(
           // width: 150.0,

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'api_manager.dart';
 import 'data_manager.dart';
-import 'colors.dart';
 import 'local_time.dart';
+import 'colors.dart';
+import 'buttons.dart';
 import 'location_weather_data.dart';
 import 'weather_displays.dart';
 import 'seven_day_forecast.dart';
@@ -27,10 +28,15 @@ class CurrentWeatherDisplay extends StatelessWidget {
     weatherData.locationString = locationString;
 
     return FutureBuilder(
-      future: weatherData.getCurrentWeather(),
+      future: weatherData.loadPageData(),
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const CircularProgressIndicator();
+        if (snapshot.hasError || weatherData.currentCity == null) {
+          return Container(
+            color: Colors.white,
+            child: const Center(
+              child: CircularProgressIndicator()
+            ),
+          );
         }
 
         final TextTheme textTheme = Theme.of(context).textTheme.apply(
@@ -42,7 +48,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
           TimeBasedColorScheme.colorSchemeFromLocalTime(
             LocalTime.getLocalDayPercent(weatherData.locationLongitude)
           );
-
+        
         return Theme(
           data: Theme.of(context).copyWith(textTheme: textTheme),
           child: Scaffold(
@@ -81,10 +87,11 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                     Padding(
                                       padding: EdgeInsets.only(
                                         left: screenHeight / 50.0,
-                                        top: screenHeight / 75.0
+                                        right: screenHeight / 50.0,
+                                        top: screenHeight / 75.0,
                                       ),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Flexible(
                                             child: FittedBox(
@@ -95,6 +102,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                                   Navigator.pop(context);
                                                 },
                                                 child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
                                                     Icon(
                                                       Icons.arrow_back_ios_new_rounded,
@@ -116,6 +124,11 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                                 ),
                                               ),
                                             ),
+                                          ),
+
+                                          FavoriteButton(
+                                            addTarget: weatherData.searchInput!,
+                                            initialState: (weatherData.isInFavorites) ? FavButtonStates.readyToRemove : FavButtonStates.readyToAdd,
                                           ),
                                         ],
                                       ),
@@ -198,57 +211,83 @@ class CurrentWeatherDisplay extends StatelessWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Container(
-                            width: screenWidth / 12.0,
-                            color: colorScheme.mainBGColor,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: screenWidth / 72.0),
-                              child: Icon(
-                                Icons.home,
-                                color: Colors.white,
-                                size: screenWidth / 18.0,
+
+                          // Home Button
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              width: screenWidth / 12.0,
+                              color: colorScheme.mainBGColor,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: screenWidth / 72.0),
+                                child: Icon(
+                                  Icons.home,
+                                  color: Colors.white,
+                                  size: screenWidth / 18.0,
+                                ),
                               ),
                             ),
                           ),
+
                           SizedBox(
                             height: bottomBarHeight,
                             width: screenWidth * 11.0 / 12.0,
                             child: SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Bottom BAR",
-                                    style: TextStyle(
-                                      fontSize: screenWidth / 20.0,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Bottom BAR",
-                                    style: TextStyle(
-                                      fontSize: screenWidth / 20.0,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Bottom BAR",
-                                    style: TextStyle(
-                                      fontSize: screenWidth / 20.0,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Bottom BAR",
-                                    style: TextStyle(
-                                      fontSize: screenWidth / 20.0,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Bottom BAR",
-                                    style: TextStyle(
-                                      fontSize: screenWidth / 20.0,
-                                    ),
-                                  ),
-                                ],
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                shrinkWrap: true,
+                                itemCount: weatherData.favoriteLocationNames.length,
+                                itemBuilder:(context, index) {
+                                  String currentFavorite = weatherData.favoriteLocationNames[index];
+                                  String currentSearch = weatherData.favoriteLocationSearches[index];
+                                  bool isViewingFavorite = locationString.contains(currentSearch);
+                                  return Row(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          if (isViewingFavorite) {
+                                            return;
+                                          }
+                                          Navigator.pop(context);
+                                          Navigator.push(
+                                            context, 
+                                            MaterialPageRoute(
+                                              builder: (context) => CurrentWeatherDisplay(
+                                                locationString: currentSearch
+                                              ),
+                                            )
+                                          );
+                                        },
+                                        child: Text(
+                                          currentFavorite,
+                                          style: TextStyle(
+                                            fontSize: screenWidth / 20.0,
+                                            fontWeight: (isViewingFavorite) 
+                                            ? FontWeight.bold
+                                            : null
+                                          ),
+                                        ),
+                                      ),
+
+                                      //Funky way of doing
+                                      // if (index < itemCount)
+                                      //   return VerticalDivider()
+                                      // else
+                                      //   return Padding()
+                                      (index >= weatherData.favoriteLocationNames.length - 1)
+                                      ? Padding(padding: EdgeInsets.only(right: screenWidth / 36.0))
+                                      : VerticalDivider(
+                                        thickness: 2,
+                                        color: Colors.white,
+                                        indent: screenWidth / 36.0,
+                                        endIndent: screenWidth / 36.0,
+                                      ),
+                                    ],
+                                  );
+                                },
                               ),
                             ),
                           ),
@@ -266,69 +305,6 @@ class CurrentWeatherDisplay extends StatelessWidget {
   }
 }
 
-class NavigationButton extends StatelessWidget {
-  final String label;
-  final Widget destinationWidget;
-
-  const NavigationButton({
-    super.key,
-    required this.label,
-    required this.destinationWidget,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context, 
-          MaterialPageRoute(
-            builder: (context) => destinationWidget
-          )
-        );
-      },
-
-      child: Padding(
-        padding: EdgeInsets.all(screenWidth / 21.3),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(screenHeight / 30.0),
-          child: Container(
-            color: const Color(0x80E7E7E7),
-            child: SizedBox(
-              height: screenHeight / 15.0,
-              child: Padding(
-                padding: EdgeInsets.only(left: screenWidth / 21.3, right: screenWidth / 42.6),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  
-                  children: [
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: screenHeight / 35.5,
-                      ),
-                    ),
-
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: Colors.white,
-                      size: screenHeight / 32.0,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class WeatherData {
   String? locationString;
 
@@ -336,7 +312,8 @@ class WeatherData {
     this.locationString,
   });
 
-  String? currentCity = "";
+  String? currentCity;
+  String? searchInput;
   int? currentTemp = 0;
   String? currentUnits = "";
   String? currentCond = "";
@@ -348,22 +325,38 @@ class WeatherData {
   String? time;
   double? locationLongitude;
   List<Periods>? futurePeriods;
+  List<String> favoriteLocationNames = [];
+  List<String> favoriteLocationSearches = [];
+  bool isInFavorites = false;
 
   bool isFirstTimeLoad = true;
 
-  Future<void> getCurrentWeather() async {
+  Future<void> loadPageData() async {
     if (!isFirstTimeLoad) {
       return;
     }
 
+    await getCurrentWeather();
+    await getFavoritesData();
+    
+    isFirstTimeLoad = false;
+  }
+
+  Future<void> getCurrentWeather() async {
+
+    // Get Weather Data from DataManager
     LocationWeatherData weatherLocation = await DataManager.searchForLocation(locationString!);
     HourlyForecast forecast = await DataManager.getForecast(weatherLocation, ForecastType.hourly);
     Periods currentPeriod = forecast.properties!.periods![0];
+
+    // Pieces of data that need to be formatted later
     ProbabilityOfPrecipitation? precipitation = currentPeriod.probabilityOfPrecipitation;
     ProbabilityOfPrecipitation? humidity = currentPeriod.relativeHumidity;
     Elevation? dewPoint = currentPeriod.dewpoint;
 
+    // Storing all the needed information
     currentCity = weatherLocation.displayableString;
+    searchInput = weatherLocation.searchInput;
     currentTemp = currentPeriod.temperature;
     currentUnits = currentPeriod.temperatureUnit;
     currentCond = currentPeriod.shortForecast;
@@ -381,8 +374,24 @@ class WeatherData {
     locationLongitude = weatherLocation.long!;
 
     futurePeriods = forecast.properties!.periods!.sublist(1);
+  }
 
-    isFirstTimeLoad = false;
+  Future<void> getFavoritesData() async {
+    favoriteLocationNames = [];
+    for (var favorite in DataManager.getFavorites()) {
+      String favName = favorite.displayableString!;
+      favoriteLocationNames.add(favName.substring(0, favName.indexOf(",")));
+
+      String favSearch = favorite.searchInput!;
+      favoriteLocationSearches.add(favSearch);
+    }
+
+    for (String fav in favoriteLocationSearches) {
+      if (locationString!.contains(fav)) {
+        isInFavorites = true;
+        break;
+      }
+    }
   }
 
   String? formatUnitValueString(int? value, String? unitCode) {
