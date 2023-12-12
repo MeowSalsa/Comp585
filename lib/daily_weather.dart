@@ -127,7 +127,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                           ),
 
                                           FavoriteButton(
-                                            addTarget: weatherData.currentCity!,
+                                            addTarget: weatherData.searchInput!,
                                             initialState: (weatherData.isInFavorites) ? FavButtonStates.readyToRemove : FavButtonStates.readyToAdd,
                                           ),
                                         ],
@@ -242,7 +242,8 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                 itemCount: weatherData.favoriteLocationNames.length,
                                 itemBuilder:(context, index) {
                                   String currentFavorite = weatherData.favoriteLocationNames[index];
-                                  bool isViewingFavorite = weatherData.locationString!.contains(currentFavorite);
+                                  String currentSearch = weatherData.favoriteLocationSearches[index];
+                                  bool isViewingFavorite = locationString.contains(currentSearch);
                                   return Row(
                                     children: [
                                       GestureDetector(
@@ -255,7 +256,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                             context, 
                                             MaterialPageRoute(
                                               builder: (context) => CurrentWeatherDisplay(
-                                                locationString: currentFavorite
+                                                locationString: currentSearch
                                               ),
                                             )
                                           );
@@ -312,6 +313,7 @@ class WeatherData {
   });
 
   String? currentCity;
+  String? searchInput;
   int? currentTemp = 0;
   String? currentUnits = "";
   String? currentCond = "";
@@ -354,6 +356,7 @@ class WeatherData {
 
     // Storing all the needed information
     currentCity = weatherLocation.displayableString;
+    searchInput = weatherLocation.searchInput;
     currentTemp = currentPeriod.temperature;
     currentUnits = currentPeriod.temperatureUnit;
     currentCond = currentPeriod.shortForecast;

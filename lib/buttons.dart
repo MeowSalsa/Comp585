@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'data_manager.dart';
+import 'location_weather_data.dart';
 
 enum FavButtonStates {
   readyToAdd,
@@ -89,6 +92,7 @@ class FavoriteButton extends StatefulWidget {
 class _FavoriteButtonState extends State<FavoriteButton> {
 
   late FavButtonStates currentState;
+  Timer? currentDelayedAction;
 
   @override
   void initState() {
@@ -98,16 +102,27 @@ class _FavoriteButtonState extends State<FavoriteButton> {
     });
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+
+    if (currentDelayedAction != null) {
+      currentDelayedAction!.cancel();
+    }
+  }
+
   Widget _readyToAddButton(double size) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         
         setState(() {
           currentState = FavButtonStates.adding;
         });
 
-        Future.delayed(const Duration(seconds: 2), () {
-          
+        LocationWeatherData locationToAdd = await DataManager.searchForLocation(widget.addTarget);
+        await DataManager.addToFavorites(locationToAdd);
+
+        currentDelayedAction = Timer(const Duration(seconds: 2), () {
           setState(() {
             currentState = FavButtonStates.readyToRemove;
           });
@@ -136,14 +151,16 @@ class _FavoriteButtonState extends State<FavoriteButton> {
 
   Widget _readyToRemoveButton(double size) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         
         setState(() {
           currentState = FavButtonStates.removing;
         });
 
-        Future.delayed(const Duration(seconds: 2), () {
-          
+        LocationWeatherData locationToRemove = await DataManager.searchForLocation(widget.addTarget);
+        DataManager.removeFromFavorites(locationToRemove);
+
+        currentDelayedAction = Timer(const Duration(seconds: 2), () {
           setState(() {
             currentState = FavButtonStates.readyToAdd;
           });
