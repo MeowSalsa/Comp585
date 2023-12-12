@@ -105,9 +105,6 @@ class _ForecastPageState extends State<ForecastPage> {
             var data = snapshot.data!.properties!.periods!;
             List<DayData> weekData = groupWeekData(data);
 
-            List<int> minLowInds = [];
-            List<int> maxHighInds = [];
-
             int minLow = weekData[0].low!;
             int maxHigh = weekData[0].high!;
 

@@ -27,7 +27,7 @@ class CurrentWeatherDisplay extends StatelessWidget {
     weatherData.locationString = locationString;
 
     return FutureBuilder(
-      future: weatherData.getCurrentWeather(),
+      future: weatherData.loadPageData(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return const CircularProgressIndicator();
@@ -215,40 +215,40 @@ class CurrentWeatherDisplay extends StatelessWidget {
                             width: screenWidth * 11.0 / 12.0,
                             child: SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Bottom BAR",
-                                    style: TextStyle(
-                                      fontSize: screenWidth / 20.0,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Bottom BAR",
-                                    style: TextStyle(
-                                      fontSize: screenWidth / 20.0,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Bottom BAR",
-                                    style: TextStyle(
-                                      fontSize: screenWidth / 20.0,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Bottom BAR",
-                                    style: TextStyle(
-                                      fontSize: screenWidth / 20.0,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Bottom BAR",
-                                    style: TextStyle(
-                                      fontSize: screenWidth / 20.0,
-                                    ),
-                                  ),
-                                ],
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                shrinkWrap: true,
+                                itemCount: weatherData.favoriteLocationNames.length,
+                                itemBuilder:(context, index) {
+                                  String currentFavorite = weatherData.favoriteLocationNames[index];
+                                  return Row(
+                                    children: [
+                                      Text(
+                                        currentFavorite,
+                                        style: TextStyle(
+                                          fontSize: screenWidth / 20.0,
+                                          fontWeight: (weatherData.locationString!.contains(currentFavorite)) 
+                                          ? FontWeight.bold
+                                          : null
+                                        ),
+                                      ),
+
+                                      //Funky way of doing
+                                      // if (index < itemCount)
+                                      //   return VerticalDivider()
+                                      // else
+                                      //   return null
+                                      (index >= weatherData.favoriteLocationNames.length - 1)
+                                      ? Padding(padding: EdgeInsets.only(right: screenWidth / 36.0))
+                                      : VerticalDivider(
+                                        thickness: 2,
+                                        color: Colors.white,
+                                        indent: screenWidth / 36.0,
+                                        endIndent: screenWidth / 36.0,
+                                      ),
+                                    ],
+                                  );
+                                },
                               ),
                             ),
                           ),
@@ -348,21 +348,34 @@ class WeatherData {
   String? time;
   double? locationLongitude;
   List<Periods>? futurePeriods;
+  List<String> favoriteLocationNames = [];
 
   bool isFirstTimeLoad = true;
 
-  Future<void> getCurrentWeather() async {
+  Future<void> loadPageData() async {
     if (!isFirstTimeLoad) {
       return;
     }
 
+    await getCurrentWeather();
+    await getFavoriteNames();
+    
+    isFirstTimeLoad = false;
+  }
+
+  Future<void> getCurrentWeather() async {
+
+    // Get Weather Data from DataManager
     LocationWeatherData weatherLocation = await DataManager.searchForLocation(locationString!);
     HourlyForecast forecast = await DataManager.getForecast(weatherLocation, ForecastType.hourly);
     Periods currentPeriod = forecast.properties!.periods![0];
+
+    // Pieces of data that need to be formatted later
     ProbabilityOfPrecipitation? precipitation = currentPeriod.probabilityOfPrecipitation;
     ProbabilityOfPrecipitation? humidity = currentPeriod.relativeHumidity;
     Elevation? dewPoint = currentPeriod.dewpoint;
 
+    // Storing all the needed information
     currentCity = weatherLocation.displayableString;
     currentTemp = currentPeriod.temperature;
     currentUnits = currentPeriod.temperatureUnit;
@@ -381,8 +394,13 @@ class WeatherData {
     locationLongitude = weatherLocation.long!;
 
     futurePeriods = forecast.properties!.periods!.sublist(1);
+  }
 
-    isFirstTimeLoad = false;
+  Future<void> getFavoriteNames() async {
+    for (var favorite in DataManager.getFavorites()) {
+      String favName = favorite.displayableString!;
+      favoriteLocationNames.add(favName.substring(0, favName.indexOf(",")));
+    }
   }
 
   String? formatUnitValueString(int? value, String? unitCode) {
