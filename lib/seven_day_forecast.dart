@@ -221,21 +221,26 @@ class _ForecastPageState extends State<ForecastPage> {
                     ),
                   ),
 
-                  ListView.separated(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    itemCount: weekData.length,
-                    separatorBuilder: (context, index) => const Divider(
-                      thickness: 4,
-                      color: Colors.white,
-                      indent: 10,
-                      endIndent: 10,
-                    ),
-                    itemBuilder: (context, index) {
-                      var dayData = weekData[index];
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: screenWidth / 21.3),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(screenHeight / 30.0),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: screenWidth / 42.6),
+                        color: const Color(0x80E7E7E7),
+                        child:ListView.separated(
+                          padding: EdgeInsets.zero,
+                          shrinkWrap: true,
+                          itemCount: weekData.length,
+                          separatorBuilder: (context, index) => Padding(padding: EdgeInsets.only(top: screenHeight / 80.0),),
+                          itemBuilder: (context, index) {
+                            var dayData = weekData[index];
 
-                      return _buildForecastItem(dayData, minLowInds.contains(index), maxHighInds.contains(index));
-                    },
+                            return _buildForecastItem(dayData, minLowInds.contains(index), maxHighInds.contains(index));
+                          },
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -259,7 +264,7 @@ class _ForecastPageState extends State<ForecastPage> {
           style: TextStyle(
             color: Colors.white,
             fontSize: screenWidth / 20.0,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w900,
           ),
         ),
 
