@@ -127,23 +127,6 @@ class _ForecastPageState extends State<ForecastPage> {
               }
             }
 
-            // To account for ties of highest high or lowest low
-            for (int i = 0; i < weekData.length; i++)
-            {
-              int currLow = weekData[i].low!;
-              int currHigh = weekData[i].high!;
-
-              if (currLow == minLow)
-              {
-                minLowInds.add(i);
-              }
-
-              if (currHigh == maxHigh)
-              {
-                maxHighInds.add(i);
-              }
-            }
-
             double topPadding = MediaQuery.of(context).viewPadding.top;
             double screenWidth = MediaQuery.of(context).size.width;
             double screenHeight = MediaQuery.of(context).size.height;
@@ -226,17 +209,19 @@ class _ForecastPageState extends State<ForecastPage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(screenHeight / 30.0),
                       child: Container(
-                        padding: EdgeInsets.symmetric(vertical: screenWidth / 42.6),
+                        padding: EdgeInsets.all(screenWidth / 42.6),
                         color: const Color(0x80E7E7E7),
                         child:ListView.separated(
                           padding: EdgeInsets.zero,
                           shrinkWrap: true,
                           itemCount: weekData.length,
-                          separatorBuilder: (context, index) => Padding(padding: EdgeInsets.only(top: screenHeight / 80.0),),
+                          separatorBuilder: (context, index) => Padding(
+                            padding: EdgeInsets.only(top: screenHeight / 80.0),
+                          ),
                           itemBuilder: (context, index) {
                             var dayData = weekData[index];
 
-                            return _buildForecastItem(dayData, minLowInds.contains(index), maxHighInds.contains(index));
+                            return _buildForecastItem(dayData, minLow, maxHigh);
                           },
                         ),
                       ),
@@ -253,7 +238,7 @@ class _ForecastPageState extends State<ForecastPage> {
     );
   }
 
-  Widget _buildForecastItem(DayData data, bool hasMinLow, bool hasMaxHigh) {
+  Widget _buildForecastItem(DayData data, int minLow, int maxHigh) {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Row(
@@ -275,19 +260,62 @@ class _ForecastPageState extends State<ForecastPage> {
           '${data.low}',
           style: TextStyle(
             color: Colors.white,
-            fontWeight: (!hasMinLow) ? null : FontWeight.bold,
+            fontWeight: (data.low != minLow) ? null : FontWeight.bold,
             fontSize: screenWidth / 15.0,
           ),
         ),
+
+        _buildTemperatureBar(minLow, maxHigh, data.low!, data.high!),
+
         Text(
           '${data.high}',
           style: TextStyle(
             color: Colors.white,
-            fontWeight: (!hasMaxHigh) ? null : FontWeight.bold,
+            fontWeight: (data.high != maxHigh) ? null : FontWeight.bold,
             fontSize: screenWidth / 15.0,
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildTemperatureBar(int min, int max, int start, int end) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    double barWidth = screenWidth * 3.0 / 16.0;
+    double barHeight = screenWidth / 72.0;
+
+    double innerBarPercent = (end - start) / (max - min);
+    double innerBarWidth = barWidth * innerBarPercent;
+
+    double innerBarSpacingPercent = (start - min) / (max - min);
+    double innerBarSpacing = barWidth * innerBarSpacingPercent;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(barHeight / 2.0),
+      child: Container(
+        color:const Color(0x80808080),
+        child: SizedBox(
+          width: barWidth,
+          height: barHeight,
+          child: Row(
+            children: [
+              Padding(padding: EdgeInsets.only(left: innerBarSpacing)),
+
+              ClipRRect(
+                borderRadius: BorderRadius.circular(barHeight / 2.0),
+                child: Container(
+                  color: Colors.white,
+                  child: SizedBox(
+                    width: innerBarWidth,
+                    height: barHeight,
+                  )
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
