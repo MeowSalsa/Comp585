@@ -187,9 +187,12 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                         destinationWidget: ForecastPage(locationString: weatherData.currentCity!),
                                       ),
 
-                                      const NavigationButton(
+                                      NavigationButton(
                                         label: "Weather Radar",
-                                        destinationWidget: Radar(),
+                                        destinationWidget: Radar(
+                                          locationString: weatherData.currentCity!,
+                                          locationLongitude: weatherData.locationLongitude,
+                                        ),
                                       ),
 
                                       // Placeholder for buttons
