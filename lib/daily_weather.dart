@@ -8,6 +8,7 @@ import 'buttons.dart';
 import 'location_weather_data.dart';
 import 'weather_displays.dart';
 import 'seven_day_forecast.dart';
+import 'radar_page.dart';
 
 class CurrentWeatherDisplay extends StatelessWidget {
   final String locationString;
@@ -184,6 +185,11 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                       NavigationButton(
                                         label: "Weekly Forecast",
                                         destinationWidget: ForecastPage(locationString: weatherData.currentCity!),
+                                      ),
+
+                                      const NavigationButton(
+                                        label: "Weather Radar",
+                                        destinationWidget: Radar(),
                                       ),
 
                                       // Placeholder for buttons
