@@ -31,7 +31,31 @@ class CurrentWeatherDisplay extends StatelessWidget {
     return FutureBuilder(
       future: weatherData.loadPageData(),
       builder: (context, snapshot) {
-        if (snapshot.hasError || weatherData.currentCity == null) {
+        if (snapshot.hasError)
+        {
+          return Container(
+            color: Colors.white,
+            child: SizedBox(
+              width: screenWidth,
+              height: screenHeight,
+              child: Center(
+                child: Column(
+                  children: [
+                    Text("${snapshot.error}"),
+                    BackButton(
+                      color: Colors.blue,
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting || weatherData.currentCity == null) {
           return Container(
             color: Colors.white,
             child: const Center(
@@ -194,9 +218,6 @@ class CurrentWeatherDisplay extends StatelessWidget {
                                           locationLongitude: weatherData.locationLongitude,
                                         ),
                                       ),
-
-                                      // Placeholder for buttons
-                                      Padding(padding: EdgeInsets.only(top: bottomBarHeight)),
                                     ],
                                   ),
                                 ),
