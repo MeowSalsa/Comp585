@@ -29,3 +29,6 @@ flutter:
     - family: WeatherIcons
       fonts:
        - asset: assets/fonts/WeatherIcons.ttf
+    - family: CompassIcon
+      fonts:
+       - asset: assets/fonts/CompassIcon.ttf

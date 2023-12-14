@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'api_manager.dart';
 import 'local_time.dart';
 import 'weather_icons.dart';
+import 'compass_icon.dart';
 
 class MajorWeatherDisplay extends StatelessWidget {
   final String temperatureLabel;
@@ -199,32 +200,34 @@ class MinorWeatherDisplay extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(screenWidth / 18.0),
         child: Container(
-            padding: EdgeInsets.all(screenWidth / 24.0),
-            color: const Color(0x80E7E7E7),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      "$titleText",
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontSize: screenWidth / 22.5,
+          padding: EdgeInsets.all(screenWidth / 24.0),
+          color: const Color(0x80E7E7E7),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  "$titleText",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    fontSize: screenWidth / 22.5,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: displayWidget,
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Center(
-                            child: displayWidget,
-                          ),
-                        ]),
-                  ),
-                ])),
+                    ]),
+              ),
+            ]
+          ),
+        ),
       ),
     );
   }
@@ -327,15 +330,42 @@ class WindDisplay extends StatelessWidget {
       displayWidget: Center(
         child: Stack(
           children: [
-            SizedBox(
-              width: compassSize,
-              height: compassSize,
-              child: Icon(
-                Icons.brightness_1_outlined,
-                color: Colors.white,
-                size: compassSize,
-              ),
+
+            //Compass Background
+            Icon(
+              CompassIcon.semi_major_lines,
+              color: Colors.white60,
+              size: compassSize
             ),
+            Icon(
+              CompassIcon.major_lines,
+              color: Colors.white,
+              size: compassSize
+            ),
+            Icon(
+              CompassIcon.minor_lines,
+              color: Colors.white38,
+              size: compassSize
+            ),
+
+            Icon(
+              CompassIcon.directions,
+              color: Colors.white,
+              size: compassSize
+            ),
+            Icon(
+              CompassIcon.north_direction,
+              color: Colors.red,
+              size: compassSize
+            ),
+
+            Icon(
+              CompassIcon.north_arrow,
+              color: Colors.black,
+              size: compassSize
+            ),
+
+            //Compass Needle
             Transform.rotate(
               angle: needleAngle,
               child: SizedBox(
@@ -343,8 +373,8 @@ class WindDisplay extends StatelessWidget {
                 height: compassSize,
                 child: Center(
                   child: Icon(
-                    Icons.north,
-                    color: Colors.red,
+                    CompassIcon.needle,
+                    color: Colors.white,
                     size: compassSize,
                   ),
                 ),
