@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'api_manager.dart';
 import 'data_manager.dart';
 import 'location_weather_data.dart';
@@ -276,16 +277,16 @@ class _ForecastPageState extends State<ForecastPage> {
     );
   }
 
-  Widget _buildTemperatureBar(int min, int max, int start, int end) {
+  Widget _buildTemperatureBar(int low, int high, int start, int end) {
     double screenWidth = MediaQuery.of(context).size.width;
 
     double barWidth = screenWidth * 3.0 / 16.0;
     double barHeight = screenWidth / 72.0;
 
-    double innerBarPercent = (end - start) / (max - min);
-    double innerBarWidth = barWidth * innerBarPercent;
-
-    double innerBarSpacingPercent = (start - min) / (max - min);
+    double innerBarPercent = (end - start) / (high - low);
+    double innerBarWidth = max(1.0, barWidth * innerBarPercent);
+    
+    double innerBarSpacingPercent = (start - low) / (high - low);
     double innerBarSpacing = barWidth * innerBarSpacingPercent;
 
     return ClipRRect(

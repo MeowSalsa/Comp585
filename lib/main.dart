@@ -13,10 +13,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Load favorites from file
   await DataManager.loadFavorites();
-  for (var favorite in DataManager.getFavorites())
-  {
-    await DataManager.initializeLocation(favorite);
-  }
   /* var newLocation = await DataManager.searchForLocation("Eugene, Oregon");
   await DataManager.addToFavorites(newLocation);
   newLocation = await DataManager.searchForLocation("91331");
@@ -35,53 +31,8 @@ class RootApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: MyApp(),
-    );
-  }
-}
-
-Future<String> fetchWeatherDetails(String city) async {
-  await Future.delayed(const Duration(seconds: 1));
-  return "Weather details for $city";
-}
-
-class DetailScreen extends StatefulWidget {
-  final String city;
-
-  const DetailScreen({Key? key, required this.city}) : super(key: key);
-
-  @override
-  _DetailScreenState createState() => _DetailScreenState();
-}
-
-class _DetailScreenState extends State<DetailScreen> {
-  late Future<String> weatherDetails;
-
-  @override
-  void initState() {
-    super.initState();
-    weatherDetails = fetchWeatherDetails(widget.city);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('${widget.city} Weather Details')),
-      body: Center(
-        child: FutureBuilder<String>(
-          future: weatherDetails,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return const Text("Error fetching weather details");
-            } else {
-              return Text(snapshot.data ?? "No details available");
-            }
-          },
-        ),
-      ),
     );
   }
 }
@@ -119,6 +70,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    
     DateTime currentDate = DateTime.now();
     String formattedDate = DateFormat('EEEE, MMMM d, y').format(currentDate);
     formattedDate = formattedDate.substring(0, formattedDate.lastIndexOf(",")) + getOrdinal(currentDate.day) + formattedDate.substring(formattedDate.lastIndexOf(","));
