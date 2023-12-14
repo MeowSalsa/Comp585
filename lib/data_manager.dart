@@ -250,6 +250,7 @@ class DataManager {
     for (var value in _favoriteLocations.values) {
       print("Initializing Hourly Forecast for ${value.searchInput}");
       await _getHourlyForecast(value.searchInput!);
+      await initializeLocation(value);
     }
   }
 
