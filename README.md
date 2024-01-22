@@ -46,7 +46,7 @@ Pressing the 'Weather Radar' button on the current forecast page will redirect y
 ### Favorite Locations
 <img src="https://github.com/MeowSalsa/Comp585/assets/100064587/0c5bf954-565b-4ff2-9544-bcbf211243a6" width="200" alt="Adding favorite location">  
 
-Add locations to favorites by pressing '+' button on upper right corner. Alternatively, remove locations from favorites by pressing '-' button on upper right corner.
+Add locations to favorites by pressing the '+' button on upper right corner. Alternatively, remove locations from favorites by pressing the '-' button on upper right corner.
 
 
 <img src="https://github.com/MeowSalsa/Comp585/assets/100064587/f10d901b-4ff6-46c7-8cb8-01355710557b" width="200" alt="Weather Or Not Home page">  
