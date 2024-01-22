@@ -15,6 +15,7 @@ dependencies:
   path_provider: ^2.1.1
   cached_network_image: ^3.3.0
   flutter_animate: ^4.2.0+1
+  flutter_dotenv: ^5.1.0
 
 
 
@@ -32,3 +33,5 @@ flutter:
     - family: CompassIcon
       fonts:
        - asset: assets/fonts/CompassIcon.ttf
+  assets:
+    - .env

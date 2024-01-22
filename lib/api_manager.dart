@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 /* Additionally, in your AndroidManifest.xml file, add the Internet permission.
     <!-- Required to fetch data from the internet. -->
@@ -435,6 +435,8 @@ class Location {
 ///and returning the appropriate object that can hold the data required for the
 ///application.
 class APIManager {
+  String googleAPIKey = dotenv.get("API_KEY", fallback: "");
+
   ///  Uses two coordinates to make a call to National Weather API
   ///  to retrieve the id, gridId, gridX, gridY.
   ///
@@ -498,7 +500,7 @@ class APIManager {
   Future<CoordinatesFromLocation?> getCoordinatesFromLocation(
       String location) async {
     final response = await http.get(Uri.parse(
-        "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=AIzaSyDeKwo1CHHgV09Jfh-MVGxHzpvKWDXr-vQ"));
+        "https://maps.googleapis.com/maps/api/geocode/json?address=$location&key=$googleAPIKey"));
     if (response.statusCode == 200) {
       print("Geocode Location->Coord HTTP: Success");
       final data = jsonDecode(response.body);

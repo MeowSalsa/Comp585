@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'data_manager.dart';
 import 'api_manager.dart';
@@ -11,6 +12,7 @@ import 'weather_displays.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   //Load favorites from file
   await DataManager.loadFavorites();
   /* var newLocation = await DataManager.searchForLocation("Eugene, Oregon");
@@ -48,32 +50,30 @@ class _MyAppState extends State<MyApp> {
   final TextEditingController _controller = TextEditingController();
   List<LocationWeatherData> favoriteLocations = DataManager.getFavorites();
 
-  String getOrdinal(int num)
-  {
-    if(num >= 11 && num <= 13)
-    {
+  String getOrdinal(int num) {
+    if (num >= 11 && num <= 13) {
       return "th";
     }
 
-    switch(num % 10)
-    {
-      case 1: 
+    switch (num % 10) {
+      case 1:
         return "st";
-      case 2: 
+      case 2:
         return "nd";
-      case 3: 
+      case 3:
         return "rd";
-      default: 
+      default:
         return "th";
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    
     DateTime currentDate = DateTime.now();
     String formattedDate = DateFormat('EEEE, MMMM d, y').format(currentDate);
-    formattedDate = formattedDate.substring(0, formattedDate.lastIndexOf(",")) + getOrdinal(currentDate.day) + formattedDate.substring(formattedDate.lastIndexOf(","));
+    formattedDate = formattedDate.substring(0, formattedDate.lastIndexOf(",")) +
+        getOrdinal(currentDate.day) +
+        formattedDate.substring(formattedDate.lastIndexOf(","));
 
     return Scaffold(
       backgroundColor: Colors.lightBlue[50],
@@ -122,13 +122,14 @@ class _MyAppState extends State<MyApp> {
               child: Text(
                 formattedDate,
                 style: const TextStyle(
-                  fontSize: 24.0, 
+                  fontSize: 24.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
             const Padding(padding: EdgeInsets.only(top: 20.0)),
-            Expanded(child: CurvedSquareIcon(favoriteLocations: favoriteLocations)),
+            Expanded(
+                child: CurvedSquareIcon(favoriteLocations: favoriteLocations)),
           ],
         ),
       ),
@@ -149,7 +150,6 @@ class CurvedSquareIcon extends StatefulWidget {
 
 class _CurvedSquareIconState extends State<CurvedSquareIcon> {
   late Future<List<Periods>> weatherForecasts;
-  
 
   @override
   void initState() {
@@ -177,7 +177,6 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
 
   @override
   Widget build(BuildContext context) {
-
     if (widget.favoriteLocations.isNotEmpty) {
       return GridView.count(
         crossAxisCount: 2,
@@ -194,8 +193,8 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
     }
   }
 
-
-  Widget _buildWeatherBoxWithLocationObject(BuildContext context, LocationWeatherData location) {
+  Widget _buildWeatherBoxWithLocationObject(
+      BuildContext context, LocationWeatherData location) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
@@ -204,10 +203,13 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
     var temperature = '${currentForecast.temperature ?? 'N/A'}°';
     String weather = currentForecast.shortForecast ?? 'Unavailable';
 
-    TimeBasedColorScheme colorScheme = TimeBasedColorScheme.colorSchemeFromLocalTime(LocalTime.getLocalDayPercent(location.long));
+    TimeBasedColorScheme colorScheme =
+        TimeBasedColorScheme.colorSchemeFromLocalTime(
+            LocalTime.getLocalDayPercent(location.long));
 
-    print("${location.displayableString} (${location.long}) last updated at ${location.hourlyForecastTimeStamp}");
-    
+    print(
+        "${location.displayableString} (${location.long}) last updated at ${location.hourlyForecastTimeStamp}");
+
     // This widget builds each individual weather box with the city, temperature, and weather condition.
     return Material(
       color: Colors.transparent,
@@ -217,8 +219,8 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
             context,
             MaterialPageRoute(
               builder: (context) => CurrentWeatherDisplay(
-                locationString: location.searchInput ?? "something went wrong"
-              ),
+                  locationString:
+                      location.searchInput ?? "something went wrong"),
             ),
           );
 
@@ -256,34 +258,28 @@ class _CurvedSquareIconState extends State<CurvedSquareIcon> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 MiniWeatherDisplay(
-                  topLabel: Text(
-                    city,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: Colors.white,
-                    )
-                  ),
+                  topLabel: Text(city,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Colors.white,
+                      )),
                   conditionString: weather,
                   bottomLabel: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        temperature,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        )
-                      ),
-                      Text(
-                        weather,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                        )
-                      ),
+                      Text(temperature,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          )),
+                      Text(weather,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white,
+                          )),
                     ],
                   ),
                   iconSize: screenWidth / 10.0,
