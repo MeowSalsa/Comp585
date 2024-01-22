@@ -45,7 +45,6 @@ class DataManager {
   static Future<List<Periods>> _getDayForecast(String locationString) async {
     List<Periods> dailyForecast = List.empty(growable: true);
     var weeklyForecast = await _getWeeklyForecast(locationString);
-    //var nowForecast = weeklyForecast.properties?.periods?[0];
     dailyForecast.add(weeklyForecast.properties!.periods![0]);
     dailyForecast.add(weeklyForecast.properties!.periods![1]);
     return dailyForecast;
@@ -157,7 +156,6 @@ class DataManager {
     CoordinatesFromLocation? locationCoordinateData;
     locationCoordinateData = await APIManager()
         .getCoordinatesFromLocation(locationData.searchInput!);
-    //if locationData ! null, perform bottom. add an else
     if (locationCoordinateData != null) {
       //have to iterate through lists to find the proper data the below stuff
       locationData.location =
@@ -182,12 +180,12 @@ class DataManager {
       } else if (component.types?[0] == "neighborhood") {
         locationData.displayableString = component.longName;
       } else if (component.types?[0] == "locality") {
-          locationData.displayableString ??= component.longName;
+        locationData.displayableString ??= component.longName;
       } else if (component.types?[0] == "administrative_area_level_1") {
-        locationData.displayableString = 
-          (!locationData.displayableString!.contains(component.shortName!)) 
-            ? "${locationData.displayableString!}, ${component.shortName!}" 
-            : locationData.displayableString;
+        locationData.displayableString =
+            (!locationData.displayableString!.contains(component.shortName!))
+                ? "${locationData.displayableString!}, ${component.shortName!}"
+                : locationData.displayableString;
       }
     }
   }
@@ -218,13 +216,10 @@ class DataManager {
     try {
       final file = await _localFile;
       print("Reading from disk on ${file.path}");
-
       // Read the file
       final contents = await file.readAsString();
-
       return contents;
     } catch (e) {
-      // If encountering an error, return 0
       return "Error reading file";
     }
   }

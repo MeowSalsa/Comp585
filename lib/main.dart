@@ -15,16 +15,6 @@ void main() async {
   await dotenv.load(fileName: ".env");
   //Load favorites from file
   await DataManager.loadFavorites();
-  /* var newLocation = await DataManager.searchForLocation("Eugene, Oregon");
-  await DataManager.addToFavorites(newLocation);
-  newLocation = await DataManager.searchForLocation("91331");
-  await DataManager.addToFavorites(newLocation);
-  newLocation = await DataManager.searchForLocation("Los Angeles, California");
-  await DataManager.addToFavorites(newLocation);
-  newLocation = await DataManager.searchForLocation("Houston, Texas");
-  await DataManager.addToFavorites(newLocation);
-  newLocation = await DataManager.searchForLocation("New York, New York");
-  await DataManager.addToFavorites(newLocation); */
   runApp(const RootApp());
 }
 

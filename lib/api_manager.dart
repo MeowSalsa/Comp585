@@ -3,9 +3,6 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-/* Additionally, in your AndroidManifest.xml file, add the Internet permission.
-    <!-- Required to fetch data from the internet. -->
-    <uses-permission android:name="android.permission.INTERNET" /> */
 
 ///
 /// API DOCUMENTATION: https://www.weather.gov/documentation/services-web-api#/
@@ -54,7 +51,6 @@ class Properties {
         ? RelativeLocation.fromJson(json['relativeLocation'])
         : null;
   }
-//Might need this section for saving user's favorited locations.
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['@id'] = id;
@@ -223,7 +219,6 @@ class ProbabilityOfPrecipitation {
   }
 }
 
-//Hourly Forecast classes
 class HourlyForecast {
   ForecastProperties? properties;
 
@@ -236,105 +231,7 @@ class HourlyForecast {
   }
 }
 
-/* class HourlyForecastProperties {
-  String? updated;
-  String? units;
-  String? forecastGenerator;
-  String? generatedAt;
-  String? updateTime;
-  String? validTimes;
-  Elevation? elevation;
-  List<Periods>? periods;
-
-  HourlyForecastProperties(
-      {this.updated,
-      this.units,
-      this.forecastGenerator,
-      this.generatedAt,
-      this.updateTime,
-      this.validTimes,
-      this.periods});
-
-  HourlyForecastProperties.fromJson(Map<String, dynamic> json) {
-    updated = json['updated'];
-    units = json['units'];
-    forecastGenerator = json['forecastGenerator'];
-    generatedAt = json['generatedAt'];
-    updateTime = json['updateTime'];
-    validTimes = json['validTimes'];
-    elevation = json['elevation'] != null
-        ? Elevation.fromJson(json['elevation'])
-        : null;
-    if (json['periods'] != null) {
-      periods = <Periods>[];
-      json['periods'].forEach((v) {
-        periods!.add(Periods.fromJson(v));
-      });
-    }
-  }
-} */
-
-/* class HourlyPeriods {
-  int? number;
-  String? name;
-  String? startTime;
-  String? endTime;
-  bool? isDaytime;
-  int? temperature;
-  String? temperatureUnit;
-  ProbabilityOfPrecipitation? probabilityOfPrecipitation;
-  Elevation? dewpoint;
-  ProbabilityOfPrecipitation? relativeHumidity;
-  String? windSpeed;
-  String? windDirection;
-  String? icon;
-  String? shortForecast;
-  String? detailedForecast;
-
-  HourlyPeriods(
-      {this.number,
-      this.name,
-      this.startTime,
-      this.endTime,
-      this.isDaytime,
-      this.temperature,
-      this.temperatureUnit,
-      this.probabilityOfPrecipitation,
-      this.dewpoint,
-      this.relativeHumidity,
-      this.windSpeed,
-      this.windDirection,
-      this.icon,
-      this.shortForecast,
-      this.detailedForecast});
-
-  HourlyPeriods.fromJson(Map<String, dynamic> json) {
-    number = json['number'];
-    name = json['name'];
-    startTime = json['startTime'];
-    endTime = json['endTime'];
-    isDaytime = json['isDaytime'];
-    temperature = json['temperature'];
-    temperatureUnit = json['temperatureUnit'];
-    probabilityOfPrecipitation = json['probabilityOfPrecipitation'] != null
-        ? ProbabilityOfPrecipitation.fromJson(
-            json['probabilityOfPrecipitation'])
-        : null;
-    dewpoint =
-        json['dewpoint'] != null ? Elevation.fromJson(json['dewpoint']) : null;
-    relativeHumidity = json['relativeHumidity'] != null
-        ? ProbabilityOfPrecipitation.fromJson(json['relativeHumidity'])
-        : null;
-    windSpeed = json['windSpeed'];
-    windDirection = json['windDirection'];
-    icon = json['icon'];
-    shortForecast = json['shortForecast'];
-    detailedForecast = json['detailedForecast'];
-  }
-} */
-
 //Geocoding: Coordinates from zip code
-
 class CoordinatesFromLocation {
   List<Results>? results;
   String? status;
@@ -356,16 +253,10 @@ class Results {
   List<AddressComponents>? addressComponents;
   String? formattedAddress;
   Geometry? geometry;
-/*   String? placeId;
-  List<String>? postcodeLocalities;
-  List<String>? types; */
 
   Results({
     this.formattedAddress,
     this.geometry,
-    /* this.placeId,
-      this.postcodeLocalities,
-      this.types */
   });
 
   Results.fromJson(Map<String, dynamic> json) {
@@ -378,9 +269,6 @@ class Results {
     formattedAddress = json['formatted_address'];
     geometry =
         json['geometry'] != null ? Geometry.fromJson(json['geometry']) : null;
-    //placeId = json['place_id'];
-    //postcodeLocalities = json['postcode_localities'].cast<String>();
-    //types = json['types'].cast<String>();
   }
 }
 
@@ -508,7 +396,6 @@ class APIManager {
       final newCoord = CoordinatesFromLocation.fromJson(data);
       return newCoord;
     } else {
-      //return a null location instead. Prevents stack from being thrown out
       print("Geocode Location->Coord HTTP: Fail");
       return null;
     }
